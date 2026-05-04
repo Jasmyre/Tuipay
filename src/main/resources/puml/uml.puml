@@ -1,7 +1,13 @@
 @startuml
-title Tuipay - Core Structure (Model Managers In Services Package)
+title Tuipay - System UML (Models + Services + Core Flow)
 
+skinparam packageStyle rectangle
+
+' =======================
+' MODELS
+' =======================
 package "models" {
+
   class Student {
     - String studentId
     - String username
@@ -10,7 +16,9 @@ package "models" {
     - double tuitionBalance
     - double walletBalance
     - List<Transaction> transactions
-    + addTransaction(transaction: Transaction)
+    + topUp(amount: double)
+    + payTuition(amount: double)
+    + addTransaction(t: Transaction)
     + getTransactionHistory(): List<Transaction>
   }
 
@@ -35,97 +43,103 @@ package "models" {
     TOP_UP
     TUITION_PAYMENT
   }
+
+  Student "1" --> "*" Transaction
 }
 
+' =======================
+' SERVICES
+' =======================
 package "services" {
-  class AppManagerService {
+
+  class AppServices {
     - StudentManager studentManager
     - TransactionManager transactionManager
     - AdminManager adminManager
     - String currentAccountId
     - String currentAccountRole
     + initializeManagers()
-    + getStudentManager(): StudentManager
-    + getTransactionManager(): TransactionManager
-    + getAdminManager(): AdminManager
-    + setCurrentAccount(accountId: String, role: String)
-    + getCurrentAccountId(): String
-    + getCurrentAccountRole(): String
+    + setCurrentAccount(id: String, role: String)
     + clearCurrentAccount()
   }
 
   class StudentManager {
     + getAllStudents(): List<Student>
-    + findStudentById(studentId: String): Student
+    + findStudentById(id: String): Student
     + topUpWallet(student: Student, amount: double)
     + payTuition(student: Student, amount: double): boolean
-    + updateTuitionBalance(studentId: String, amount: double)
   }
 
   class TransactionManager {
     + createTopUpTransaction(student: Student, amount: double): Transaction
     + createPaymentTransaction(student: Student, amount: double): Transaction
-    + getAllTransactions(students: List<Student>): List<Transaction>
+    + getAllTransactions(): List<Transaction>
   }
 
   class AdminManager {
     + getAdmin(): Admin
-    + viewStudentRecords(): List<Student>
-    + viewAllTransactions(): List<Transaction>
+    + viewStudents(): List<Student>
+    + viewTransactions(): List<Transaction>
   }
+
+  AppServices --> StudentManager
+  AppServices --> TransactionManager
+  AppServices --> AdminManager
+
+  StudentManager --> Student
+  TransactionManager --> Transaction
+  AdminManager --> Admin
+  AdminManager --> Student
+  AdminManager --> Transaction
 }
 
-package "core" {
-  class App
-  class TestDataSeeder {
-    + seed(services: AppManagerService)
-  }
-}
+' =======================
+' UI LAYER (PAGES)
+' =======================
+package "pages (Swing UI)" {
 
-package "pages" {
-  class AppFrame
-  class LoginPage
+  class AppFrame {
+    + switchPage(name: String)
+  }
+
   class HomePage
-  class ManageStudentsPage
-  class TopUpPage
-  class PayTuitionPage
-  class TransactionHistoryPage
-  class ViewTransactionsPage
-  class UpdateTuitionPage
+  class StudentPage
+  class TransactionPage
+  class AdminPage
+  class ReportsPage
+
+  AppFrame --> HomePage
+  AppFrame --> StudentPage
+  AppFrame --> TransactionPage
+  AppFrame --> AdminPage
+  AppFrame --> ReportsPage
+
+  HomePage --> StudentManager
+  HomePage --> TransactionManager
+
+  StudentPage --> StudentManager
+  TransactionPage --> TransactionManager
+  AdminPage --> AdminManager
+  AdminPage --> StudentManager
+  AdminPage --> TransactionManager
+  ReportsPage --> StudentManager
+  ReportsPage --> TransactionManager
 }
 
-Student "1" *-- "*" Transaction
-Transaction --> TransactionType
+' =======================
+' BOOTSTRAP
+' =======================
+class App {
+  + main()
+}
 
-StudentManager --> Student
-StudentManager --> TransactionManager
-TransactionManager --> Transaction
-AdminManager --> Admin
-AdminManager --> Student
-AdminManager --> TransactionManager
-AppManagerService --> StudentManager
-AppManagerService --> TransactionManager
-AppManagerService --> AdminManager
-AppManagerService --> Student
-AppManagerService --> Admin
+class TestDataSeeder {
+  + seed(AppServices)
+}
 
-App --> AppManagerService
-TestDataSeeder --> AppManagerService
-
-AppFrame --> AppManagerService
-AppFrame --> LoginPage
-
-HomePage --> AppManagerService
-ManageStudentsPage --> AppManagerService
-TopUpPage --> AppManagerService
-PayTuitionPage --> AppManagerService
-TransactionHistoryPage --> AppManagerService
-ViewTransactionsPage --> AppManagerService
-UpdateTuitionPage --> AppManagerService
-
-note right of LoginPage
-Authentication stays in LoginPage
-(no AuthService/AuthManager in services).
-end note
+App --> AppServices
+App --> TestDataSeeder
+TestDataSeeder --> StudentManager
+TestDataSeeder --> TransactionManager
 
 @enduml
