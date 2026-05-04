@@ -106,12 +106,12 @@ public class AppFrame extends JFrame implements NavigationHandler {
   private void wireLoginAction() {
     loginPage.getLoginButton().addActionListener(e -> {
       if (loginPage.authenticate()) {
-        currentUser = loginPage.getUsername();
+        currentUser = loginPage.getId();
         currentDestination = Navigation.HOME;
         appVisible = true;
         showApp();
       } else {
-        JOptionPane.showMessageDialog(this, "Invalid name or password", "Error",
+        JOptionPane.showMessageDialog(this, "Invalid ID or password", "Error",
                                       JOptionPane.ERROR_MESSAGE);
       }
     });

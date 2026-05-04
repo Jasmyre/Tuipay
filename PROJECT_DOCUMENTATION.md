@@ -14,7 +14,7 @@ This project is built as a **demo prototype only**, meaning:
 * No real bank integration
 * No database connection
 * Uses **session-based storage only** (data resets when the app closes)
-* Uses **seeded/demo student and admin accounts**
+* Uses **seeded/demo student and admin accounts** (including profile usernames)
 
 The goal is to simulate a simple tuition payment process while focusing only on the **core features**.
 
@@ -24,7 +24,7 @@ The goal is to simulate a simple tuition payment process while focusing only on 
 
 The system allows:
 
-* Students to log in
+* Users to log in using ID and password
 * View tuition balance
 * Simulate wallet top-up
 * Pay tuition
@@ -65,32 +65,36 @@ Admins can:
 
 ## Student Accounts
 
-| Student ID  | Password   |
-| ----------- | ---------- |
-| 202311-1001 | student123 |
-| 202311-1002 | student123 |
+| Student ID  | Username  | Password   |
+| ----------- | --------- | ---------- |
+| 202311-1001 | student01 | student123 |
+| 202311-1002 | student02 | student123 |
 
 ## Admin Account
 
-| Username | Password |
-| -------- | -------- |
-| admin    | admin123 |
+| Admin ID | Username | Password |
+| -------- | -------- | -------- |
+| ADMIN001 | admin    | admin123 |
 
 ---
 
-# Student Flow
+# Unified Login Flow
 
 ## 1. Login
 
-Student enters:
+User enters:
 
-* Student ID
+* ID
 * Password
 
-System validates credentials from seeded data.
+System validates credentials from seeded data and automatically determines role by ID.
+Username is profile data loaded from seed records and is not used for login.
 
-If valid:
+If ID belongs to a student and password is correct:
 → Redirect to Student Dashboard
+
+If ID belongs to admin and password is correct:
+→ Redirect to Admin Dashboard
 
 If invalid:
 → Show error message
@@ -181,17 +185,14 @@ User returns to login screen.
 
 # Admin Flow
 
-## 1. Admin Login
+## 1. Access via Unified Login
 
 Admin enters:
 
-* Username
+* Admin ID
 * Password
 
-System validates admin credentials.
-
-If valid:
-→ Redirect to Admin Dashboard
+System validates admin credentials and routes to the Admin Dashboard automatically.
 
 ---
 
@@ -263,7 +264,7 @@ Admin session ends.
 
 This project intentionally focuses only on essential features:
 
-✅ Login authentication
+✅ Unified ID + password login authentication
 ✅ Student dashboard
 ✅ Wallet top-up simulation
 ✅ Tuition payment simulation

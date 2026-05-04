@@ -6,7 +6,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 public class LoginPage extends JPanel {
-  private final JTextField nameField = new JTextField(20);
+  private final JTextField idField = new JTextField(20);
   private final JPasswordField passwordField = new JPasswordField(20);
   private final JButton loginButton = UITheme.primaryButton("Log In");
   private final JCheckBox showPasswordCheck = new JCheckBox("Show password");
@@ -19,9 +19,9 @@ public class LoginPage extends JPanel {
     passwordEchoChar = passwordField.getEchoChar();
     Border line = UITheme.roundedBorder(UITheme.BORDER, 1, 12);
     Border padding = new EmptyBorder(8, 8, 8, 8);
-    UITheme.themeTextField(nameField);
+    UITheme.themeTextField(idField);
     UITheme.themeTextField(passwordField);
-    nameField.setBorder(new CompoundBorder(line, padding));
+    idField.setBorder(new CompoundBorder(line, padding));
     passwordField.setBorder(new CompoundBorder(line, padding));
 
     JPanel center = new JPanel(new GridBagLayout());
@@ -43,13 +43,13 @@ public class LoginPage extends JPanel {
     subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
     UITheme.themeLabel(subtitle);
 
-    JLabel nameLabel = new JLabel("Name:");
-    nameLabel.setFont(UITheme.LABEL_FONT);
-    nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-    UITheme.themeLabel(nameLabel);
+    JLabel idLabel = new JLabel("ID:");
+    idLabel.setFont(UITheme.LABEL_FONT);
+    idLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    UITheme.themeLabel(idLabel);
 
-    nameField.setMaximumSize(new Dimension(320, 28));
-    nameField.setAlignmentX(Component.LEFT_ALIGNMENT);
+    idField.setMaximumSize(new Dimension(320, 28));
+    idField.setAlignmentX(Component.LEFT_ALIGNMENT);
 
     JLabel passwordLabel = new JLabel("Password:");
     passwordLabel.setFont(UITheme.LABEL_FONT);
@@ -78,9 +78,9 @@ public class LoginPage extends JPanel {
     card.add(Box.createVerticalStrut(6));
     card.add(subtitle);
     card.add(Box.createVerticalStrut(18));
-    card.add(nameLabel);
+    card.add(idLabel);
     card.add(Box.createVerticalStrut(6));
-    card.add(nameField);
+    card.add(idField);
     card.add(Box.createVerticalStrut(12));
     card.add(passwordLabel);
     card.add(Box.createVerticalStrut(6));
@@ -99,16 +99,18 @@ public class LoginPage extends JPanel {
 
   public JButton getLoginButton() { return loginButton; }
 
-  public String getUsername() { return nameField.getText(); }
+  public String getId() { return idField.getText(); }
 
   public void clearFields() {
-    nameField.setText("");
+    idField.setText("");
     passwordField.setText("");
   }
 
   public boolean authenticate() {
-    String name = nameField.getText();
+    String id = idField.getText();
     String password = new String(passwordField.getPassword());
-    return name.equals("admin") && password.equals("password");
+    return (id.equals("ADMIN001") && password.equals("admin123"))
+        || (id.equals("202311-1001") && password.equals("student123"))
+        || (id.equals("202311-1002") && password.equals("student123"));
   }
 }

@@ -5,6 +5,7 @@ package "models" {
 
   class Student {
     - String studentId
+    - String username
     - String fullName
     - String password
     - double tuitionBalance
@@ -18,10 +19,11 @@ package "models" {
   }
 
   class Admin {
+    - String adminId
     - String username
     - String password
 
-    + authenticate(username: String, password: String): boolean
+    + authenticate(id: String, password: String): boolean
   }
 
   class Transaction {
@@ -52,8 +54,7 @@ package "services" {
     - List<Student> students
     - Admin admin
 
-    + loginStudent(studentId: String, password: String): Student
-    + loginAdmin(username: String, password: String): Admin
+    + login(id: String, password: String): Object
     + logout()
   }
 
