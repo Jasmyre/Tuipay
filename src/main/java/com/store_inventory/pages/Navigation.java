@@ -1,14 +1,13 @@
 package com.store_inventory.pages;
 
 public final class Navigation {
-  public static final String LOGIN = "login";
-  public static final String APP = "app";
   public static final String HOME = "home";
-  public static final String PRODUCTS = "products";
-  public static final String INVENTORY = "inventory";
-  public static final String SALES = "sales";
-  public static final String REPORTS = "reports";
-  public static final String REPORT_DETAIL = "reportDetail";
+  public static final String MANAGE_STUDENTS = "manageStudents";
+  public static final String VIEW_TRANSACTIONS = "viewTransactions";
+  public static final String UPDATE_TUITION = "updateTuition";
+  public static final String TOP_UP = "topUp";
+  public static final String PAY_TUITION = "payTuition";
+  public static final String TRANSACTION_HISTORY = "transactionHistory";
 
   private Navigation() {}
 }

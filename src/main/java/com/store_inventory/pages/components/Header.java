@@ -8,11 +8,16 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
 public class Header extends JPanel {
+  private static final String ADMIN_ID_PREFIX = "ADMIN";
+
   private final JLabel titleLabel = new JLabel();
   private final JLabel userLabel = new JLabel();
+  private final JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 12));
+  private final NavigationHandler handler;
   private String currentUser = "";
 
   public Header(String title, String user, NavigationHandler handler) {
+    this.handler = handler;
     setLayout(new BorderLayout());
     setBackground(UITheme.HEADER_BACKGROUND);
     setBorder(new MatteBorder(0, 0, 1, 0, UITheme.BORDER));
@@ -38,17 +43,9 @@ public class Header extends JPanel {
     leftWrapper.setOpaque(false);
     leftWrapper.add(left, new GridBagConstraints());
 
-    JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 12));
     right.setOpaque(false);
     right.setBorder(new EmptyBorder(0, 0, 0, 12));
-
-    right.add(navButton("Home", Navigation.HOME, handler));
-    right.add(navButton("Products", Navigation.PRODUCTS, handler));
-    right.add(navButton("Inventory", Navigation.INVENTORY, handler));
-    right.add(navButton("Sales", Navigation.SALES, handler));
-    right.add(navButton("Reports", Navigation.REPORTS, handler));
-    right.add(modeToggleButton(handler));
-    right.add(logoutButton(handler));
+    rebuildNavigation();
 
     add(leftWrapper, BorderLayout.WEST);
     add(right, BorderLayout.EAST);
@@ -66,9 +63,36 @@ public class Header extends JPanel {
     currentUser = user.trim();
     userLabel.setText("User: " + currentUser);
     userLabel.setVisible(true);
+    rebuildNavigation();
   }
 
   public String getUser() { return currentUser; }
+
+  private void rebuildNavigation() {
+    right.removeAll();
+
+    if (isAdminUser()) {
+      right.add(navButton("Admin Dashboard", Navigation.HOME, handler));
+      right.add(navButton("Manage Students", Navigation.MANAGE_STUDENTS, handler));
+      right.add(navButton("View Transactions", Navigation.VIEW_TRANSACTIONS, handler));
+      right.add(navButton("Update Tuition", Navigation.UPDATE_TUITION, handler));
+    } else {
+      right.add(navButton("Dashboard", Navigation.HOME, handler));
+      right.add(navButton("Top Up", Navigation.TOP_UP, handler));
+      right.add(navButton("Pay Tuition", Navigation.PAY_TUITION, handler));
+      right.add(navButton("Transaction History", Navigation.TRANSACTION_HISTORY, handler));
+    }
+
+    right.add(modeToggleButton(handler));
+    right.add(logoutButton(handler));
+    right.revalidate();
+    right.repaint();
+  }
+
+  private boolean isAdminUser() {
+    return currentUser != null
+        && currentUser.toUpperCase().startsWith(ADMIN_ID_PREFIX);
+  }
 
   private JButton navButton(String label, String destination,
                             NavigationHandler handler) {
