@@ -15,7 +15,7 @@ public final class TestDataSeeder {
     services.getStudentManager().clearStudents();
 
     services.getStudentManager().addStudent(
-        new Student("202311-1001", "student01", "Student One", "student123",
+        new Student("20250033", "student01", "Student One", "password",
                     15000.0, 3000.0));
     services.getStudentManager().addStudent(
         new Student("202311-1002", "student02", "Student Two", "student123",
