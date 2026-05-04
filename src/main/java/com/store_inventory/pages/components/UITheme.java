@@ -198,7 +198,7 @@ public final class UITheme {
       new Color(208, 79, 153, 255) // shadow md
   );
 
-  private static ThemeMode activeThemeMode = ThemeMode.LIGHT;
+  private static ThemeMode activeThemeMode = ThemeMode.DARK;
 
   public static final int RADIUS_SM = 6 * 2;
   public static final int RADIUS_MD = 8 * 2;
@@ -257,7 +257,7 @@ public final class UITheme {
   public static final Font LABEL_FONT = new Font(FONT_FAMILY, Font.PLAIN, 16);
 
   static {
-    applyPalette(LIGHT_PALETTE);
+    applyPalette(DARK_PALETTE);
   }
 
   private UITheme() {}
