@@ -101,16 +101,11 @@ public class LoginPage extends JPanel {
 
   public String getId() { return idField.getText(); }
 
+  public String getPassword() { return new String(passwordField.getPassword()); }
+
   public void clearFields() {
     idField.setText("");
     passwordField.setText("");
   }
 
-  public boolean authenticate() {
-    String id = idField.getText();
-    String password = new String(passwordField.getPassword());
-    return (id.equals("ADMIN001") && password.equals("admin123"))
-        || (id.equals("202311-1001") && password.equals("student123"))
-        || (id.equals("202311-1002") && password.equals("student123"));
-  }
 }

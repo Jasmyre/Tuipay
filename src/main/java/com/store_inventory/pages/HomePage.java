@@ -1,84 +1,38 @@
 package com.store_inventory.pages;
 
+import com.store_inventory.AppServices;
+import com.store_inventory.dto.StudentDashboardDTO;
+import com.store_inventory.models.Student;
 import com.store_inventory.pages.components.UITheme;
-import com.store_inventory.services.InventoryManager;
-import com.store_inventory.services.SalesManager;
 import java.awt.*;
 import java.text.DecimalFormat;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 
 public class HomePage extends JPanel implements Refreshable {
   private static final DecimalFormat CURRENCY = new DecimalFormat("#,##0.00");
-  private final InventoryManager inventory;
-  private final SalesManager sales;
-  private final JLabel productsValue = new JLabel();
-  private final JLabel inventoryValue = new JLabel();
-  private final JLabel salesValue = new JLabel();
+  private final NavigationHandler navigationHandler;
+  private final AppServices services;
+  private final JLabel studentNameValue = new JLabel("-");
+  private final JLabel studentIdValue = new JLabel("-");
+  private final JLabel tuitionBalanceValue = new JLabel("PHP 0.00");
+  private final JLabel walletBalanceValue = new JLabel("PHP 0.00");
 
-  public HomePage(InventoryManager inventory, SalesManager sales) {
-    this.inventory = inventory;
-    this.sales = sales;
+  public HomePage(NavigationHandler navigationHandler, AppServices services) {
+    this.navigationHandler = navigationHandler;
+    this.services = services;
     setLayout(new BorderLayout());
     setBackground(UITheme.BACKGROUND);
 
-    JPanel content = new JPanel(new GridLayout(1, 2, 16, 16));
+    JPanel content = new JPanel();
+    content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
     content.setOpaque(false);
-    content.setBorder(new EmptyBorder(40, 20, 40, 20));
+    content.setBorder(new javax.swing.border.EmptyBorder(28, 20, 28, 20));
 
-    JPanel left = new JPanel();
-    left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
-    left.setBackground(UITheme.BACKGROUND);
-
-    JLabel welcome = new JLabel("Welcome to the System");
-    welcome.setFont(UITheme.customFont(UITheme.FONT_FAMILY, UITheme.FONT_WEIGHT_TITLE, 32));
-    welcome.setAlignmentX(Component.LEFT_ALIGNMENT);
-    UITheme.themeLabel(welcome);
-
-    JLabel hint = new JLabel("Here is a quick overview of your store.");
-    hint.setFont(UITheme.SUBTITLE_FONT);
-    hint.setAlignmentX(Component.LEFT_ALIGNMENT);
-    UITheme.themeLabel(hint);
-
-    JPanel introCard = UITheme.cardPanel();
-    introCard.setLayout(new BoxLayout(introCard, BoxLayout.Y_AXIS));
-    introCard.setAlignmentX(Component.LEFT_ALIGNMENT);
-    introCard.add(welcome);
-    introCard.add(Box.createVerticalStrut(8));
-    introCard.add(hint);
-
-    left.add(introCard);
-    left.add(Box.createVerticalStrut(12));
-
-    productsValue.setFont(UITheme.customFont(UITheme.FONT_FAMILY,
-                                             UITheme.FONT_WEIGHT_LABEL, 22));
-    UITheme.themeLabel(productsValue);
-    inventoryValue.setFont(UITheme.customFont(UITheme.FONT_FAMILY,
-                                              UITheme.FONT_WEIGHT_LABEL, 22));
-    UITheme.themeLabel(inventoryValue);
-    salesValue.setFont(UITheme.customFont(UITheme.FONT_FAMILY,
-                                          UITheme.FONT_WEIGHT_LABEL, 22));
-    UITheme.themeLabel(salesValue);
-
-    JPanel statsGrid = new JPanel(new GridLayout(3, 1, 0, 10));
-    statsGrid.setOpaque(false);
-    statsGrid.setAlignmentX(Component.LEFT_ALIGNMENT);
-    statsGrid.add(statCard("Total Products", productsValue));
-    statsGrid.add(statCard("Total Inventory", inventoryValue));
-    statsGrid.add(statCard("Total Sales", salesValue));
-    left.add(statsGrid);
-
-    JPanel right = UITheme.cardPanel();
-    right.setLayout(new BorderLayout());
-    ImageIcon icon = new ImageIcon(getClass().getResource("/assets/icon.png"));
-    Image img = icon.getImage().getScaledInstance(350, 350, Image.SCALE_SMOOTH);
-
-    JLabel imageLabel = new JLabel(new ImageIcon(img));
-    UITheme.themeLabel(imageLabel);
-    right.add(imageLabel, BorderLayout.CENTER);
-
-    content.add(left);
-    content.add(right);
+    content.add(headerCard());
+    content.add(Box.createVerticalStrut(12));
+    content.add(balanceSection());
+    content.add(Box.createVerticalStrut(12));
+    content.add(actionsSection());
 
     JScrollPane scroll = new JScrollPane(content);
     scroll.setBorder(null);
@@ -92,29 +46,165 @@ public class HomePage extends JPanel implements Refreshable {
     refresh();
   }
 
-  private JPanel statCard(String title, JLabel valueLabel) {
+  private JPanel headerCard() {
+    JPanel card = UITheme.cardPanel();
+    card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+
+    JLabel title = new JLabel("Student Dashboard");
+    title.setFont(UITheme.TITLE_FONT);
+    title.setAlignmentX(Component.LEFT_ALIGNMENT);
+    UITheme.themeLabel(title);
+
+    JLabel studentNameLabel = new JLabel("Student Name:");
+    studentNameLabel.setFont(UITheme.SUBTITLE_FONT);
+    studentNameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    UITheme.themeLabel(studentNameLabel);
+
+    studentNameValue.setFont(UITheme.LABEL_FONT);
+    studentNameValue.setAlignmentX(Component.LEFT_ALIGNMENT);
+    UITheme.themeLabel(studentNameValue);
+
+    JLabel studentIdLabel = new JLabel("Student ID:");
+    studentIdLabel.setFont(UITheme.SUBTITLE_FONT);
+    studentIdLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    UITheme.themeLabel(studentIdLabel);
+
+    studentIdValue.setFont(UITheme.LABEL_FONT);
+    studentIdValue.setAlignmentX(Component.LEFT_ALIGNMENT);
+    UITheme.themeLabel(studentIdValue);
+
+    card.add(title);
+    card.add(Box.createVerticalStrut(6));
+    card.add(studentNameLabel);
+    card.add(Box.createVerticalStrut(2));
+    card.add(studentNameValue);
+    card.add(Box.createVerticalStrut(8));
+    card.add(studentIdLabel);
+    card.add(Box.createVerticalStrut(2));
+    card.add(studentIdValue);
+    return card;
+  }
+
+  private JPanel balanceSection() {
+    JPanel container = new JPanel(new GridLayout(1, 2, 12, 0));
+    container.setOpaque(false);
+    container.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+    tuitionBalanceValue.setFont(UITheme.TITLE_FONT);
+    tuitionBalanceValue.setAlignmentX(Component.LEFT_ALIGNMENT);
+    UITheme.themeLabel(tuitionBalanceValue);
+
+    walletBalanceValue.setFont(UITheme.TITLE_FONT);
+    walletBalanceValue.setAlignmentX(Component.LEFT_ALIGNMENT);
+    UITheme.themeLabel(walletBalanceValue);
+
+    container.add(balanceCard("Tuition Balance", tuitionBalanceValue));
+    container.add(balanceCard("Wallet Balance", walletBalanceValue));
+    return container;
+  }
+
+  private JPanel balanceCard(String title, JLabel valueLabel) {
     JPanel card = UITheme.cardPanel();
     card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
     card.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-    JLabel label = new JLabel(title);
-    label.setFont(UITheme.SUBTITLE_FONT);
-    UITheme.themeLabel(label);
+    JLabel titleLabel = new JLabel(title);
+    titleLabel.setFont(UITheme.SUBTITLE_FONT);
+    titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    UITheme.themeLabel(titleLabel);
 
-    valueLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-    label.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-    card.add(label);
-    card.add(Box.createVerticalStrut(6));
+    card.add(titleLabel);
+    card.add(Box.createVerticalStrut(8));
     card.add(valueLabel);
     return card;
   }
 
+  private JPanel actionsSection() {
+    JPanel card = UITheme.cardPanel();
+    card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+
+    JLabel actionsLabel = new JLabel("Quick Actions");
+    actionsLabel.setFont(UITheme.SUBTITLE_FONT);
+    actionsLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    UITheme.themeLabel(actionsLabel);
+
+    JButton topUpButton = actionButton("Top Up Wallet",
+                                       () -> navigationHandler.navigate(
+                                           Navigation.TOP_UP));
+    JButton payTuitionButton = actionButton("Pay Tuition",
+                                            () -> navigationHandler.navigate(
+                                                Navigation.PAY_TUITION));
+    JButton historyButton =
+        actionButton("View Transaction History",
+                     () -> navigationHandler.navigate(
+                         Navigation.TRANSACTION_HISTORY));
+    JButton logoutButton =
+        actionButton("Logout", () -> navigationHandler.logout());
+
+    card.add(actionsLabel);
+    card.add(Box.createVerticalStrut(10));
+    card.add(topUpButton);
+    card.add(Box.createVerticalStrut(8));
+    card.add(payTuitionButton);
+    card.add(Box.createVerticalStrut(8));
+    card.add(historyButton);
+    card.add(Box.createVerticalStrut(8));
+    card.add(logoutButton);
+
+    return card;
+  }
+
+  private JButton actionButton(String label, Runnable onClick) {
+    JButton button = UITheme.primaryButton(label);
+    button.setAlignmentX(Component.LEFT_ALIGNMENT);
+    button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+    button.addActionListener(e -> onClick.run());
+    return button;
+  }
+
+  public void setStudent(Student student) {
+    if (student == null) {
+      setDashboardData(new StudentDashboardDTO("-", "-", 0, 0));
+      return;
+    }
+    setDashboardData(new StudentDashboardDTO(student.getFullName(),
+                                             student.getStudentId(),
+                                             student.getTuitionBalance(),
+                                             student.getWalletBalance()));
+  }
+
+  public void setDashboardData(StudentDashboardDTO dto) {
+    if (dto == null) {
+      studentNameValue.setText("-");
+      studentIdValue.setText("-");
+      tuitionBalanceValue.setText("PHP 0.00");
+      walletBalanceValue.setText("PHP 0.00");
+      return;
+    }
+
+    studentNameValue.setText(dto.getFullName());
+    studentIdValue.setText(dto.getStudentId());
+    tuitionBalanceValue.setText(formatCurrency(dto.getTuitionBalance()));
+    walletBalanceValue.setText(formatCurrency(dto.getWalletBalance()));
+  }
+
   @Override
   public void refresh() {
-    productsValue.setText("Total Products: " + inventory.getAllProducts().size());
-    inventoryValue.setText("Total Inventory: " + inventory.getTotalUnits());
-    salesValue.setText("Total Sales: " + formatCurrency(sales.getTotalRevenue()));
+    Student currentStudent = resolveCurrentStudent();
+    if (currentStudent == null) {
+      setDashboardData(new StudentDashboardDTO("-", "-", 0, 0));
+      return;
+    }
+    setDashboardData(services.getStudentService().viewStudentDashboard(
+        currentStudent));
+  }
+
+  private Student resolveCurrentStudent() {
+    if (services == null || services.getSessionService() == null) {
+      return null;
+    }
+
+    return services.getSessionService().getCurrentStudent();
   }
 
   private String formatCurrency(double amount) {
