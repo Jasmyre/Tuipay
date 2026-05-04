@@ -319,7 +319,7 @@ public class PayTuitionPage extends JPanel implements Refreshable {
             JOptionPane.INFORMATION_MESSAGE);
         dialog.dispose();
         if (navigationHandler != null) {
-          navigationHandler.navigate(Navigation.HOME);
+          navigationHandler.navigate(Navigation.STUDENT_PAGE);
         }
       } catch (IOException ex) {
         JOptionPane.showMessageDialog(dialog,

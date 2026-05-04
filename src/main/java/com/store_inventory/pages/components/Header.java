@@ -72,12 +72,12 @@ public class Header extends JPanel {
     right.removeAll();
 
     if (isAdminUser()) {
-      right.add(navButton("Admin Dashboard", Navigation.HOME, handler));
+      right.add(navButton("Admin Dashboard", Navigation.ADMIN_PAGE, handler));
       right.add(navButton("Manage Students", Navigation.MANAGE_STUDENTS, handler));
       right.add(navButton("View Transactions", Navigation.VIEW_TRANSACTIONS, handler));
       right.add(navButton("Update Tuition", Navigation.UPDATE_TUITION, handler));
     } else {
-      right.add(navButton("Student Page", Navigation.HOME, handler));
+      right.add(navButton("Student Page", Navigation.STUDENT_PAGE, handler));
       right.add(navButton("Top Up Wallet", Navigation.TOP_UP, handler));
       right.add(navButton("Pay Tuition", Navigation.PAY_TUITION, handler));
     }

@@ -25,7 +25,7 @@ public class AppFrame extends JFrame implements NavigationHandler {
   private final Map<String, String> titles = new HashMap<>();
   private final Map<String, JPanel> pages = new HashMap<>();
   private final AppServices services;
-  private String currentDestination = Navigation.HOME;
+  private String currentDestination = Navigation.STUDENT_PAGE;
   private String currentUser = "";
   private boolean appVisible = false;
 
@@ -43,7 +43,8 @@ public class AppFrame extends JFrame implements NavigationHandler {
   }
 
   private void initializeTitles() {
-    titles.put(Navigation.HOME, "Student Page");
+    titles.put(Navigation.STUDENT_PAGE, "Student Page");
+    titles.put(Navigation.ADMIN_PAGE, "Admin Dashboard");
     titles.put(Navigation.MANAGE_STUDENTS, "Manage Students");
     titles.put(Navigation.VIEW_TRANSACTIONS, "View Transactions");
     titles.put(Navigation.UPDATE_TUITION, "Update Tuition");
@@ -92,7 +93,8 @@ public class AppFrame extends JFrame implements NavigationHandler {
 
     pagePanel.setBackground(UITheme.BACKGROUND);
     studentDashboardPage = new StudentPage(this, services);
-    addPage(Navigation.HOME, studentDashboardPage);
+    addPage(Navigation.STUDENT_PAGE, studentDashboardPage);
+    addPage(Navigation.ADMIN_PAGE, new AdminPage(services));
     addPage(Navigation.MANAGE_STUDENTS, new ManageStudentsPage(services));
     addPage(Navigation.VIEW_TRANSACTIONS, new ViewTransactionsPage(services));
     addPage(Navigation.UPDATE_TUITION, new UpdateTuitionPage(services));
@@ -112,12 +114,14 @@ public class AppFrame extends JFrame implements NavigationHandler {
       if (account != null) {
         if (account instanceof Admin) {
           currentUser = ((Admin)account).getAdminId();
+          currentDestination = Navigation.ADMIN_PAGE;
         } else if (account instanceof Student) {
           currentUser = ((Student)account).getStudentId();
+          currentDestination = Navigation.STUDENT_PAGE;
         } else {
           currentUser = loginPage.getId();
+          currentDestination = Navigation.STUDENT_PAGE;
         }
-        currentDestination = Navigation.HOME;
         appVisible = true;
         showApp();
       } else {
@@ -138,7 +142,7 @@ public class AppFrame extends JFrame implements NavigationHandler {
     currentDestination = resolveDestination(destination);
     String defaultTitle = isAdminUser() ? "Admin Dashboard" : "Student Page";
     String title = titles.getOrDefault(currentDestination, defaultTitle);
-    if (Navigation.HOME.equals(currentDestination)) {
+    if (Navigation.STUDENT_PAGE.equals(currentDestination)) {
       title = defaultTitle;
     }
     header.setTitle(title);
@@ -154,7 +158,7 @@ public class AppFrame extends JFrame implements NavigationHandler {
     services.logout();
     currentUser = "";
     appVisible = false;
-    currentDestination = Navigation.HOME;
+    currentDestination = Navigation.STUDENT_PAGE;
     loginPage.clearFields();
     rootLayout.show(rootPanel, ROOT_LOGIN);
   }
@@ -170,7 +174,7 @@ public class AppFrame extends JFrame implements NavigationHandler {
 
   private String resolveDestination(String destination) {
     if (destination == null || !pages.containsKey(destination)) {
-      return Navigation.HOME;
+      return Navigation.STUDENT_PAGE;
     }
     return destination;
   }
@@ -184,4 +188,3 @@ public class AppFrame extends JFrame implements NavigationHandler {
     return services.getCurrentAdmin() != null;
   }
 }
-
