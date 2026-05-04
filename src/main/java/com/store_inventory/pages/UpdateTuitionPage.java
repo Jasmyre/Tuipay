@@ -1,16 +1,16 @@
 package com.store_inventory.pages;
 
 import com.store_inventory.pages.components.UITheme;
-import com.store_inventory.services.AppManagerService;
+import com.store_inventory.services.AppServices;
 import java.awt.*;
 import javax.swing.*;
 
 public class UpdateTuitionPage extends JPanel implements Refreshable {
-  private final AppManagerService appManagerService;
+  private final AppServices AppServices;
   private final JLabel availableStudentsValue = new JLabel("0");
 
-  public UpdateTuitionPage(AppManagerService appManagerService) {
-    this.appManagerService = appManagerService;
+  public UpdateTuitionPage(AppServices AppServices) {
+    this.AppServices = AppServices;
     setLayout(new GridBagLayout());
     setBackground(UITheme.BACKGROUND);
 
@@ -44,7 +44,8 @@ public class UpdateTuitionPage extends JPanel implements Refreshable {
 
   @Override
   public void refresh() {
-    int count = appManagerService.getAdminManager().getAllStudents().size();
+    int count = AppServices.getAdminManager().getAllStudents().size();
     availableStudentsValue.setText("Students Available: " + count);
   }
 }
+

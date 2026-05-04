@@ -2,18 +2,18 @@ package com.store_inventory.pages;
 
 import com.store_inventory.models.Student;
 import com.store_inventory.pages.components.UITheme;
-import com.store_inventory.services.AppManagerService;
+import com.store_inventory.services.AppServices;
 import java.awt.*;
 import java.text.DecimalFormat;
 import javax.swing.*;
 
 public class PayTuitionPage extends JPanel implements Refreshable {
   private static final DecimalFormat CURRENCY = new DecimalFormat("#,##0.00");
-  private final AppManagerService appManagerService;
+  private final AppServices AppServices;
   private final JLabel tuitionBalanceValue = new JLabel("PHP 0.00");
 
-  public PayTuitionPage(AppManagerService appManagerService) {
-    this.appManagerService = appManagerService;
+  public PayTuitionPage(AppServices AppServices) {
+    this.AppServices = AppServices;
     setLayout(new GridBagLayout());
     setBackground(UITheme.BACKGROUND);
 
@@ -47,8 +47,9 @@ public class PayTuitionPage extends JPanel implements Refreshable {
 
   @Override
   public void refresh() {
-    Student currentStudent = appManagerService.getCurrentStudent();
+    Student currentStudent = AppServices.getCurrentStudent();
     double tuitionBalance = currentStudent == null ? 0 : currentStudent.getTuitionBalance();
     tuitionBalanceValue.setText("Tuition Balance: PHP " + CURRENCY.format(tuitionBalance));
   }
 }
+

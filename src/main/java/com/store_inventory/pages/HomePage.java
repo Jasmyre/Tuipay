@@ -3,7 +3,7 @@ package com.store_inventory.pages;
 import com.store_inventory.dto.StudentDashboardDTO;
 import com.store_inventory.models.Student;
 import com.store_inventory.pages.components.UITheme;
-import com.store_inventory.services.AppManagerService;
+import com.store_inventory.services.AppServices;
 import java.awt.*;
 import java.text.DecimalFormat;
 import javax.swing.*;
@@ -11,16 +11,16 @@ import javax.swing.*;
 public class HomePage extends JPanel implements Refreshable {
   private static final DecimalFormat CURRENCY = new DecimalFormat("#,##0.00");
   private final NavigationHandler navigationHandler;
-  private final AppManagerService appManagerService;
+  private final AppServices AppServices;
   private final JLabel studentNameValue = new JLabel("-");
   private final JLabel studentIdValue = new JLabel("-");
   private final JLabel tuitionBalanceValue = new JLabel("PHP 0.00");
   private final JLabel walletBalanceValue = new JLabel("PHP 0.00");
 
   public HomePage(NavigationHandler navigationHandler,
-                  AppManagerService appManagerService) {
+                  AppServices AppServices) {
     this.navigationHandler = navigationHandler;
-    this.appManagerService = appManagerService;
+    this.AppServices = AppServices;
     setLayout(new BorderLayout());
     setBackground(UITheme.BACKGROUND);
 
@@ -191,7 +191,7 @@ public class HomePage extends JPanel implements Refreshable {
 
   @Override
   public void refresh() {
-    Student currentStudent = appManagerService.getCurrentStudent();
+    Student currentStudent = AppServices.getCurrentStudent();
     if (currentStudent == null) {
       setDashboardData(new StudentDashboardDTO("-", "-", 0, 0));
       return;
@@ -206,3 +206,4 @@ public class HomePage extends JPanel implements Refreshable {
     return "PHP " + CURRENCY.format(amount);
   }
 }
+

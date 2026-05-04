@@ -2,17 +2,17 @@ package com.store_inventory.pages;
 
 import com.store_inventory.models.Transaction;
 import com.store_inventory.pages.components.UITheme;
-import com.store_inventory.services.AppManagerService;
+import com.store_inventory.services.AppServices;
 import java.awt.*;
 import java.util.List;
 import javax.swing.*;
 
 public class ViewTransactionsPage extends JPanel implements Refreshable {
-  private final AppManagerService appManagerService;
+  private final AppServices AppServices;
   private final JLabel totalTransactionsValue = new JLabel("0");
 
-  public ViewTransactionsPage(AppManagerService appManagerService) {
-    this.appManagerService = appManagerService;
+  public ViewTransactionsPage(AppServices AppServices) {
+    this.AppServices = AppServices;
     setLayout(new GridBagLayout());
     setBackground(UITheme.BACKGROUND);
 
@@ -46,9 +46,10 @@ public class ViewTransactionsPage extends JPanel implements Refreshable {
 
   @Override
   public void refresh() {
-    List<Transaction> transactions = appManagerService.getTransactionManager()
-                                     .getAllTransactions(appManagerService.getStudentManager()
+    List<Transaction> transactions = AppServices.getTransactionManager()
+                                     .getAllTransactions(AppServices.getStudentManager()
                                                              .getAllStudents());
     totalTransactionsValue.setText("Total Transactions: " + transactions.size());
   }
 }
+

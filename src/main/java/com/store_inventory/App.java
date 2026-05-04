@@ -1,13 +1,13 @@
 package com.store_inventory;
 
 import com.store_inventory.pages.AppFrame;
-import com.store_inventory.services.AppManagerService;
+import com.store_inventory.services.AppServices;
 import javax.swing.SwingUtilities;
 
 public class App {
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> {
-      AppManagerService services = new AppManagerService();
+      AppServices services = new AppServices();
       TestDataSeeder.seed(services);
 
       AppFrame frame = new AppFrame(services);

@@ -2,16 +2,16 @@ package com.store_inventory.pages;
 
 import com.store_inventory.models.Student;
 import com.store_inventory.pages.components.UITheme;
-import com.store_inventory.services.AppManagerService;
+import com.store_inventory.services.AppServices;
 import java.awt.*;
 import javax.swing.*;
 
 public class TransactionHistoryPage extends JPanel implements Refreshable {
-  private final AppManagerService appManagerService;
+  private final AppServices AppServices;
   private final JLabel totalHistoryValue = new JLabel("0");
 
-  public TransactionHistoryPage(AppManagerService appManagerService) {
-    this.appManagerService = appManagerService;
+  public TransactionHistoryPage(AppServices AppServices) {
+    this.AppServices = AppServices;
     setLayout(new GridBagLayout());
     setBackground(UITheme.BACKGROUND);
 
@@ -45,10 +45,11 @@ public class TransactionHistoryPage extends JPanel implements Refreshable {
 
   @Override
   public void refresh() {
-    Student currentStudent = appManagerService.getCurrentStudent();
+    Student currentStudent = AppServices.getCurrentStudent();
     int totalHistory = currentStudent == null
         ? 0
-        : appManagerService.getStudentManager().getPaymentHistory(currentStudent).size();
+        : AppServices.getStudentManager().getPaymentHistory(currentStudent).size();
     totalHistoryValue.setText("Total History Records: " + totalHistory);
   }
 }
+

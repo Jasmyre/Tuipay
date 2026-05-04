@@ -1,16 +1,16 @@
 package com.store_inventory.pages;
 
 import com.store_inventory.pages.components.UITheme;
-import com.store_inventory.services.AppManagerService;
+import com.store_inventory.services.AppServices;
 import java.awt.*;
 import javax.swing.*;
 
 public class ManageStudentsPage extends JPanel implements Refreshable {
-  private final AppManagerService appManagerService;
+  private final AppServices AppServices;
   private final JLabel totalStudentsValue = new JLabel("0");
 
-  public ManageStudentsPage(AppManagerService appManagerService) {
-    this.appManagerService = appManagerService;
+  public ManageStudentsPage(AppServices AppServices) {
+    this.AppServices = AppServices;
     setLayout(new GridBagLayout());
     setBackground(UITheme.BACKGROUND);
 
@@ -22,7 +22,7 @@ public class ManageStudentsPage extends JPanel implements Refreshable {
     title.setAlignmentX(Component.LEFT_ALIGNMENT);
     UITheme.themeLabel(title);
 
-    JLabel subtitle = new JLabel("Student records from AppManagerService");
+    JLabel subtitle = new JLabel("Student records from AppServices");
     subtitle.setFont(UITheme.SUBTITLE_FONT);
     subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
     UITheme.themeLabel(subtitle);
@@ -44,7 +44,8 @@ public class ManageStudentsPage extends JPanel implements Refreshable {
 
   @Override
   public void refresh() {
-    int totalStudents = appManagerService.getAdminManager().getAllStudents().size();
+    int totalStudents = AppServices.getAdminManager().getAllStudents().size();
     totalStudentsValue.setText("Total Students: " + totalStudents);
   }
 }
+

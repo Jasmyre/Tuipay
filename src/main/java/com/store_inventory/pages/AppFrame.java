@@ -5,7 +5,7 @@ import com.store_inventory.models.Student;
 import com.store_inventory.pages.components.Header;
 import com.store_inventory.pages.components.UITheme;
 import com.store_inventory.pages.components.WindowTitleBar;
-import com.store_inventory.services.AppManagerService;
+import com.store_inventory.services.AppServices;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,12 +24,12 @@ public class AppFrame extends JFrame implements NavigationHandler {
   private WindowTitleBar titleBar;
   private final Map<String, String> titles = new HashMap<>();
   private final Map<String, JPanel> pages = new HashMap<>();
-  private final AppManagerService services;
+  private final AppServices services;
   private String currentDestination = Navigation.HOME;
   private String currentUser = "";
   private boolean appVisible = false;
 
-  public AppFrame(AppManagerService services) {
+  public AppFrame(AppServices services) {
     this.services = services;
     setTitle("Tuipay");
     setUndecorated(true);
@@ -184,3 +184,4 @@ public class AppFrame extends JFrame implements NavigationHandler {
     return services.getCurrentAdmin() != null;
   }
 }
+
