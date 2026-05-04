@@ -2,18 +2,18 @@ package com.store_inventory.pages;
 
 import com.store_inventory.models.Student;
 import com.store_inventory.pages.components.UITheme;
-import com.store_inventory.services.SessionService;
+import com.store_inventory.services.AppManagerService;
 import java.awt.*;
 import java.text.DecimalFormat;
 import javax.swing.*;
 
 public class TopUpPage extends JPanel implements Refreshable {
   private static final DecimalFormat CURRENCY = new DecimalFormat("#,##0.00");
-  private final SessionService sessionService;
+  private final AppManagerService appManagerService;
   private final JLabel walletBalanceValue = new JLabel("PHP 0.00");
 
-  public TopUpPage(SessionService sessionService) {
-    this.sessionService = sessionService;
+  public TopUpPage(AppManagerService appManagerService) {
+    this.appManagerService = appManagerService;
     setLayout(new GridBagLayout());
     setBackground(UITheme.BACKGROUND);
 
@@ -47,7 +47,7 @@ public class TopUpPage extends JPanel implements Refreshable {
 
   @Override
   public void refresh() {
-    Student currentStudent = sessionService.getCurrentStudent();
+    Student currentStudent = appManagerService.getCurrentStudent();
     double walletBalance = currentStudent == null ? 0 : currentStudent.getWalletBalance();
     walletBalanceValue.setText("Wallet Balance: PHP " + CURRENCY.format(walletBalance));
   }

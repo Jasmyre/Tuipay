@@ -76,13 +76,9 @@ package "services" {
 }
 
 package "core" {
-  class AppServices {
-    - AppManagerService appManagerService
-    + getAppManagerService(): AppManagerService
-  }
-
+  class App
   class TestDataSeeder {
-    + seed(services: AppServices)
+    + seed(services: AppManagerService)
   }
 }
 
@@ -113,9 +109,8 @@ AppManagerService --> AdminManager
 AppManagerService --> Student
 AppManagerService --> Admin
 
-AppServices --> AppManagerService
-
-TestDataSeeder --> AppServices
+App --> AppManagerService
+TestDataSeeder --> AppManagerService
 
 AppFrame --> AppManagerService
 AppFrame --> LoginPage

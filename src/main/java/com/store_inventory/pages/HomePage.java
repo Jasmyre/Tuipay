@@ -3,8 +3,7 @@ package com.store_inventory.pages;
 import com.store_inventory.dto.StudentDashboardDTO;
 import com.store_inventory.models.Student;
 import com.store_inventory.pages.components.UITheme;
-import com.store_inventory.services.SessionService;
-import com.store_inventory.services.StudentService;
+import com.store_inventory.services.AppManagerService;
 import java.awt.*;
 import java.text.DecimalFormat;
 import javax.swing.*;
@@ -12,19 +11,16 @@ import javax.swing.*;
 public class HomePage extends JPanel implements Refreshable {
   private static final DecimalFormat CURRENCY = new DecimalFormat("#,##0.00");
   private final NavigationHandler navigationHandler;
-  private final StudentService studentService;
-  private final SessionService sessionService;
+  private final AppManagerService appManagerService;
   private final JLabel studentNameValue = new JLabel("-");
   private final JLabel studentIdValue = new JLabel("-");
   private final JLabel tuitionBalanceValue = new JLabel("PHP 0.00");
   private final JLabel walletBalanceValue = new JLabel("PHP 0.00");
 
   public HomePage(NavigationHandler navigationHandler,
-                  StudentService studentService,
-                  SessionService sessionService) {
+                  AppManagerService appManagerService) {
     this.navigationHandler = navigationHandler;
-    this.studentService = studentService;
-    this.sessionService = sessionService;
+    this.appManagerService = appManagerService;
     setLayout(new BorderLayout());
     setBackground(UITheme.BACKGROUND);
 
@@ -195,20 +191,15 @@ public class HomePage extends JPanel implements Refreshable {
 
   @Override
   public void refresh() {
-    Student currentStudent = resolveCurrentStudent();
+    Student currentStudent = appManagerService.getCurrentStudent();
     if (currentStudent == null) {
       setDashboardData(new StudentDashboardDTO("-", "-", 0, 0));
       return;
     }
-    setDashboardData(studentService.viewStudentDashboard(currentStudent));
-  }
-
-  private Student resolveCurrentStudent() {
-    if (sessionService == null) {
-      return null;
-    }
-
-    return sessionService.getCurrentStudent();
+    setDashboardData(new StudentDashboardDTO(currentStudent.getFullName(),
+                                             currentStudent.getStudentId(),
+                                             currentStudent.getTuitionBalance(),
+                                             currentStudent.getWalletBalance()));
   }
 
   private String formatCurrency(double amount) {

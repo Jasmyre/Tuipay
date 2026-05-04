@@ -1,11 +1,11 @@
 package com.store_inventory.pages;
 
-import com.store_inventory.AppServices;
 import com.store_inventory.models.Admin;
 import com.store_inventory.models.Student;
 import com.store_inventory.pages.components.Header;
 import com.store_inventory.pages.components.UITheme;
 import com.store_inventory.pages.components.WindowTitleBar;
+import com.store_inventory.services.AppManagerService;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,14 +24,14 @@ public class AppFrame extends JFrame implements NavigationHandler {
   private WindowTitleBar titleBar;
   private final Map<String, String> titles = new HashMap<>();
   private final Map<String, JPanel> pages = new HashMap<>();
-  private final AppServices services;
+  private final AppManagerService services;
   private String currentDestination = Navigation.HOME;
   private String currentUser = "";
   private boolean appVisible = false;
 
-  public AppFrame(AppServices services) {
+  public AppFrame(AppManagerService services) {
     this.services = services;
-    setTitle("Store Inventory");
+    setTitle("Tuipay");
     setUndecorated(true);
     setSize(1100, 700);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -61,7 +61,7 @@ public class AppFrame extends JFrame implements NavigationHandler {
 
     String currentTitle = titles.getOrDefault(currentDestination, "Page");
     header = new Header(currentTitle, currentUser, this);
-    titleBar = new WindowTitleBar(this, "Store Inventory");
+    titleBar = new WindowTitleBar(this, "Tuipay");
 
     getContentPane().removeAll();
     buildRoot();
@@ -91,22 +91,15 @@ public class AppFrame extends JFrame implements NavigationHandler {
     appPanel.add(header, BorderLayout.NORTH);
 
     pagePanel.setBackground(UITheme.BACKGROUND);
-    studentDashboardPage = new HomePage(this, services.getStudentService(),
-                                        services.getSessionService());
+    studentDashboardPage = new HomePage(this, services);
     addPage(Navigation.HOME, studentDashboardPage);
-    addPage(Navigation.MANAGE_STUDENTS,
-            new ManageStudentsPage(services.getAdminService()));
-    addPage(Navigation.VIEW_TRANSACTIONS,
-            new ViewTransactionsPage(services.getTransactionService(),
-                                     services.getTemporaryStorageService()));
-    addPage(Navigation.UPDATE_TUITION,
-            new UpdateTuitionPage(services.getAdminService()));
-    addPage(Navigation.TOP_UP, new TopUpPage(services.getSessionService()));
-    addPage(Navigation.PAY_TUITION,
-            new PayTuitionPage(services.getSessionService()));
+    addPage(Navigation.MANAGE_STUDENTS, new ManageStudentsPage(services));
+    addPage(Navigation.VIEW_TRANSACTIONS, new ViewTransactionsPage(services));
+    addPage(Navigation.UPDATE_TUITION, new UpdateTuitionPage(services));
+    addPage(Navigation.TOP_UP, new TopUpPage(services));
+    addPage(Navigation.PAY_TUITION, new PayTuitionPage(services));
     addPage(Navigation.TRANSACTION_HISTORY,
-            new TransactionHistoryPage(services.getStudentService(),
-                                       services.getSessionService()));
+            new TransactionHistoryPage(services));
 
     appPanel.add(pagePanel, BorderLayout.CENTER);
 
@@ -115,9 +108,7 @@ public class AppFrame extends JFrame implements NavigationHandler {
 
   private void wireLoginAction() {
     loginPage.getLoginButton().addActionListener(e -> {
-      Object account =
-          services.getAuthService().login(loginPage.getId(),
-                                          loginPage.getPassword());
+      Object account = services.login(loginPage.getId(), loginPage.getPassword());
       if (account != null) {
         if (account instanceof Admin) {
           currentUser = ((Admin)account).getAdminId();
@@ -160,7 +151,7 @@ public class AppFrame extends JFrame implements NavigationHandler {
 
   @Override
   public void logout() {
-    services.getAuthService().logout();
+    services.logout();
     currentUser = "";
     appVisible = false;
     currentDestination = Navigation.HOME;
@@ -190,6 +181,6 @@ public class AppFrame extends JFrame implements NavigationHandler {
   }
 
   private boolean isAdminUser() {
-    return services.getSessionService().getCurrentAdmin() != null;
+    return services.getCurrentAdmin() != null;
   }
 }
