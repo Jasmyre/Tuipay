@@ -96,7 +96,7 @@ public class AppFrame extends JFrame implements NavigationHandler {
     addPage(Navigation.MANAGE_STUDENTS, new ManageStudentsPage(services));
     addPage(Navigation.VIEW_TRANSACTIONS, new ViewTransactionsPage(services));
     addPage(Navigation.UPDATE_TUITION, new UpdateTuitionPage(services));
-    addPage(Navigation.TOP_UP, new TopUpPage(services));
+    addPage(Navigation.TOP_UP, new TopUpPage(services, this));
     addPage(Navigation.PAY_TUITION, new PayTuitionPage(services));
     addPage(Navigation.TRANSACTION_HISTORY,
             new TransactionHistoryPage(services));
