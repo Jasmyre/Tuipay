@@ -19,7 +19,7 @@ public class AppFrame extends JFrame implements NavigationHandler {
   private JPanel rootPanel;
   private JPanel pagePanel;
   private LoginPage loginPage;
-  private HomePage studentDashboardPage;
+  private StudentPage studentDashboardPage;
   private Header header;
   private WindowTitleBar titleBar;
   private final Map<String, String> titles = new HashMap<>();
@@ -43,11 +43,11 @@ public class AppFrame extends JFrame implements NavigationHandler {
   }
 
   private void initializeTitles() {
-    titles.put(Navigation.HOME, "Dashboard");
+    titles.put(Navigation.HOME, "Student Page");
     titles.put(Navigation.MANAGE_STUDENTS, "Manage Students");
     titles.put(Navigation.VIEW_TRANSACTIONS, "View Transactions");
     titles.put(Navigation.UPDATE_TUITION, "Update Tuition");
-    titles.put(Navigation.TOP_UP, "Top Up");
+    titles.put(Navigation.TOP_UP, "Top Up Wallet");
     titles.put(Navigation.PAY_TUITION, "Pay Tuition");
     titles.put(Navigation.TRANSACTION_HISTORY, "Transaction History");
   }
@@ -91,7 +91,7 @@ public class AppFrame extends JFrame implements NavigationHandler {
     appPanel.add(header, BorderLayout.NORTH);
 
     pagePanel.setBackground(UITheme.BACKGROUND);
-    studentDashboardPage = new HomePage(this, services);
+    studentDashboardPage = new StudentPage(this, services);
     addPage(Navigation.HOME, studentDashboardPage);
     addPage(Navigation.MANAGE_STUDENTS, new ManageStudentsPage(services));
     addPage(Navigation.VIEW_TRANSACTIONS, new ViewTransactionsPage(services));
@@ -136,7 +136,7 @@ public class AppFrame extends JFrame implements NavigationHandler {
   @Override
   public void navigate(String destination) {
     currentDestination = resolveDestination(destination);
-    String defaultTitle = isAdminUser() ? "Admin Dashboard" : "Dashboard";
+    String defaultTitle = isAdminUser() ? "Admin Dashboard" : "Student Page";
     String title = titles.getOrDefault(currentDestination, defaultTitle);
     if (Navigation.HOME.equals(currentDestination)) {
       title = defaultTitle;

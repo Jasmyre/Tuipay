@@ -77,10 +77,9 @@ public class Header extends JPanel {
       right.add(navButton("View Transactions", Navigation.VIEW_TRANSACTIONS, handler));
       right.add(navButton("Update Tuition", Navigation.UPDATE_TUITION, handler));
     } else {
-      right.add(navButton("Dashboard", Navigation.HOME, handler));
-      right.add(navButton("Top Up", Navigation.TOP_UP, handler));
+      right.add(navButton("Student Page", Navigation.HOME, handler));
+      right.add(navButton("Top Up Wallet", Navigation.TOP_UP, handler));
       right.add(navButton("Pay Tuition", Navigation.PAY_TUITION, handler));
-      right.add(navButton("Transaction History", Navigation.TRANSACTION_HISTORY, handler));
     }
 
     right.add(modeToggleButton(handler));
@@ -97,16 +96,16 @@ public class Header extends JPanel {
   private JButton navButton(String label, String destination,
                             NavigationHandler handler) {
     JButton button = UITheme.secondaryButton(label);
-    button.setFont(new Font("SansSerif", Font.PLAIN, 20));
-    button.setMargin(new Insets(12, 16, 12, 16));
+    button.setFont(new Font("SansSerif", Font.PLAIN, 14));
+    button.setMargin(new Insets(10, 14, 10, 14));
     button.addActionListener(e -> handler.navigate(destination));
     return button;
   }
 
   private JButton logoutButton(NavigationHandler handler) {
     JButton button = UITheme.secondaryButton("Logout");
-    button.setFont(new Font("SansSerif", Font.PLAIN, 20));
-    button.setMargin(new Insets(12, 16, 12, 16));
+    button.setFont(new Font("SansSerif", Font.PLAIN, 14));
+    button.setMargin(new Insets(10, 14, 10, 14));
     button.addActionListener(e -> handler.logout());
     return button;
   }

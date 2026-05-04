@@ -18,18 +18,28 @@ public final class TestDataSeeder {
     AdminManager adminManager = services.getAdminManager();
 
     if (adminManager.getAdmin() == null) {
-      adminManager.setAdmin(new Admin("ADMIN001", "admin", "admin123"));
+      adminManager.setAdmin(new Admin("ADMIN", "admin", "admin123"));
     }
 
-    seedStudent(studentManager, "student", "student01", "Juan Dela Cruz",
+    seedStudent(studentManager, "202509-0033", "student01", "Juan Dela Cruz",
                 "password", 12000, 2000);
     seedStudent(studentManager, "202311-1002", "student02", "Maria Santos",
                 "student123", 15000, 500);
 
-    Student student01 = studentManager.findStudentById("202311-1001");
+    Student student01 = studentManager.findStudentById("202509-0033");
     Student student02 = studentManager.findStudentById("202311-1002");
 
     if (student01 != null && student01.getTransactionHistory().isEmpty()) {
+      studentManager.topUpWallet(student01, 1000);
+      studentManager.payTuition(student01, 2500);
+      studentManager.topUpWallet(student01, 1000);
+      studentManager.payTuition(student01, 2500);
+      studentManager.topUpWallet(student01, 1000);
+      studentManager.payTuition(student01, 2500);
+      studentManager.topUpWallet(student01, 1000);
+      studentManager.payTuition(student01, 2500);
+      studentManager.topUpWallet(student01, 1000);
+      studentManager.payTuition(student01, 2500);
       studentManager.topUpWallet(student01, 1000);
       studentManager.payTuition(student01, 2500);
     }
