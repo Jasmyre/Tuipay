@@ -1,0 +1,63 @@
+@startuml
+title Inventory Management System - UI Pages (CardLayout)
+
+skinparam classAttributeIconSize 0
+top to bottom direction
+
+interface NavigationHandler {
+  + navigate(destination: String): void
+  + logout(): void
+}
+
+class AppFrame {
+  - rootLayout: CardLayout
+  - pageLayout: CardLayout
+  + showApp(): void
+}
+
+class Header {
+  - titleLabel: JLabel
+  - userLabel: JLabel
+  + setTitle(title: String): void
+  + setUser(user: String): void
+}
+
+class LoginPage {
+  - usernameField: JTextField
+  - passwordField: JPasswordField
+  - loginButton: JButton
+  + authenticate(): boolean
+}
+
+class HomePage
+
+class ProductsPage {
+  + addProduct(): void
+  + updateProduct(): void
+  + deleteProduct(): void
+}
+
+class InventoryPage
+
+class SalesPage
+
+class ReportsPage
+
+class ReportDetailPage
+
+AppFrame ..|> NavigationHandler
+Header ..> NavigationHandler
+ReportsPage ..> NavigationHandler
+
+AppFrame *-- Header
+AppFrame *-- LoginPage
+AppFrame *-- HomePage
+AppFrame *-- ProductsPage
+AppFrame *-- InventoryPage
+AppFrame *-- SalesPage
+AppFrame *-- ReportsPage
+AppFrame *-- ReportDetailPage
+
+Header ..> AppFrame : CardLayout.show(page)
+
+@enduml
