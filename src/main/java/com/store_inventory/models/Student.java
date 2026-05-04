@@ -82,22 +82,6 @@ public class Student {
         this.transactions = transactions;
     }
 
-    public void topUp(double amount) {
-        if (amount <= 0) {
-            return;
-        }
-        walletBalance += amount;
-    }
-
-    public boolean payTuition(double amount) {
-        if (amount <= 0 || amount > walletBalance || amount > tuitionBalance) {
-            return false;
-        }
-        walletBalance -= amount;
-        tuitionBalance -= amount;
-        return true;
-    }
-
     public void addTransaction(Transaction transaction) {
         if (transaction != null) {
             transactions.add(transaction);

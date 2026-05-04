@@ -1,8 +1,7 @@
 @startuml
-title Tuipay - Core Structure (Based on Documented Functionalities)
+title Tuipay - Core Structure (Model Managers In Services Package)
 
 package "models" {
-
   class Student {
     - String studentId
     - String username
@@ -11,9 +10,6 @@ package "models" {
     - double tuitionBalance
     - double walletBalance
     - List<Transaction> transactions
-
-    + topUp(amount: double)
-    + payTuition(amount: double): boolean
     + addTransaction(transaction: Transaction)
     + getTransactionHistory(): List<Transaction>
   }
@@ -22,7 +18,6 @@ package "models" {
     - String adminId
     - String username
     - String password
-
     + authenticate(id: String, password: String): boolean
   }
 
@@ -33,7 +28,6 @@ package "models" {
     - double amount
     - Date transactionDate
     - double remainingTuitionBalance
-
     + generateReceipt(): String
   }
 
@@ -44,138 +38,99 @@ package "models" {
 }
 
 package "services" {
-
-  class SeedDataService {
-    + seedStudents(): List<Student>
-    + seedAdmin(): Admin
+  class AppManagerService {
+    - StudentManager studentManager
+    - TransactionManager transactionManager
+    - AdminManager adminManager
+    - String currentAccountId
+    - String currentAccountRole
+    + initializeManagers()
+    + getStudentManager(): StudentManager
+    + getTransactionManager(): TransactionManager
+    + getAdminManager(): AdminManager
+    + setCurrentAccount(accountId: String, role: String)
+    + getCurrentAccountId(): String
+    + getCurrentAccountRole(): String
+    + clearCurrentAccount()
   }
 
-  class AuthService {
-    - List<Student> students
-    - Admin admin
-
-    + login(id: String, password: String): Object
-    + logout()
-  }
-
-  class StudentService {
-    + viewStudentDashboard(student: Student): StudentDashboardDTO
+  class StudentManager {
+    + getAllStudents(): List<Student>
+    + findStudentById(studentId: String): Student
     + topUpWallet(student: Student, amount: double)
     + payTuition(student: Student, amount: double): boolean
-    + getPaymentHistory(student: Student): List<Transaction>
-  }
-
-  class AdminService {
-    - List<Student> students
-
-    + viewAdminDashboard(): AdminDashboardDTO
-    + getAllStudents(): List<Student>
-    + getAllTransactions(): List<Transaction>
     + updateTuitionBalance(studentId: String, amount: double)
   }
 
-  class SessionService {
-    - Student currentStudent
-    - Admin currentAdmin
-
-    + setCurrentStudent(student: Student)
-    + getCurrentStudent(): Student
-    + setCurrentAdmin(admin: Admin)
-    + getCurrentAdmin(): Admin
-    + clearSession()
-  }
-
-  class TransactionService {
+  class TransactionManager {
     + createTopUpTransaction(student: Student, amount: double): Transaction
     + createPaymentTransaction(student: Student, amount: double): Transaction
     + getAllTransactions(students: List<Student>): List<Transaction>
   }
 
-  class TemporaryStorageService {
-    - List<Student> students
-    - Admin admin
-    - Map<String, Object> sessionData
+  class AdminManager {
+    + getAdmin(): Admin
+    + viewStudentRecords(): List<Student>
+    + viewAllTransactions(): List<Transaction>
+  }
+}
 
-    + initializeSeedData()
-    + resetOnAppClose()
+package "core" {
+  class AppServices {
+    - AppManagerService appManagerService
+    + getAppManagerService(): AppManagerService
+  }
+
+  class TestDataSeeder {
+    + seed(services: AppServices)
   }
 }
 
 package "pages" {
   class AppFrame
+  class LoginPage
   class HomePage
   class ManageStudentsPage
-  class ViewTransactionsPage
-  class UpdateTuitionPage
   class TopUpPage
   class PayTuitionPage
   class TransactionHistoryPage
-}
-
-package "dto" {
-  class StudentDashboardDTO {
-    + String fullName
-    + String studentId
-    + double tuitionBalance
-    + double walletBalance
-  }
-
-  class AdminDashboardDTO {
-    + int totalStudents
-    + double totalPaymentsMade
-    + double totalRemainingBalances
-  }
-}
-
-package "constraints" {
-  note "Demo Prototype Limitations:\n- No real payment gateway integration\n- No real database persistence\n- Session-based temporary data only\n- Seeded accounts only\n- No registration/forgot-password flow" as DemoLimitations
+  class ViewTransactionsPage
+  class UpdateTuitionPage
 }
 
 Student "1" *-- "*" Transaction
 Transaction --> TransactionType
 
-SeedDataService --> Student
-SeedDataService --> Admin
+StudentManager --> Student
+StudentManager --> TransactionManager
+TransactionManager --> Transaction
+AdminManager --> Admin
+AdminManager --> Student
+AdminManager --> TransactionManager
+AppManagerService --> StudentManager
+AppManagerService --> TransactionManager
+AppManagerService --> AdminManager
+AppManagerService --> Student
+AppManagerService --> Admin
 
-AuthService --> Student
-AuthService --> Admin
-AuthService --> SessionService
+AppServices --> AppManagerService
 
-StudentService --> Student
-StudentService --> TransactionService
-StudentService --> StudentDashboardDTO
+TestDataSeeder --> AppServices
 
-AdminService --> Student
-AdminService --> TransactionService
-AdminService --> AdminDashboardDTO
+AppFrame --> AppManagerService
+AppFrame --> LoginPage
 
-SessionService --> Student
-SessionService --> Admin
+HomePage --> AppManagerService
+ManageStudentsPage --> AppManagerService
+TopUpPage --> AppManagerService
+PayTuitionPage --> AppManagerService
+TransactionHistoryPage --> AppManagerService
+ViewTransactionsPage --> AppManagerService
+UpdateTuitionPage --> AppManagerService
 
-TransactionService --> Transaction
-TransactionService --> Student
-
-TemporaryStorageService --> SeedDataService
-TemporaryStorageService --> Student
-TemporaryStorageService --> Admin
-DemoLimitations .. TemporaryStorageService
-
-AppFrame --> AuthService
-AppFrame --> SessionService
-AppFrame --> StudentService
-AppFrame --> AdminService
-AppFrame --> TransactionService
-AppFrame --> TemporaryStorageService
-
-HomePage --> StudentService
-HomePage --> SessionService
-ManageStudentsPage --> AdminService
-ViewTransactionsPage --> TransactionService
-ViewTransactionsPage --> TemporaryStorageService
-UpdateTuitionPage --> AdminService
-TopUpPage --> SessionService
-PayTuitionPage --> SessionService
-TransactionHistoryPage --> StudentService
-TransactionHistoryPage --> SessionService
+note right of LoginPage
+Authentication stays in LoginPage
+(no AuthService/AuthManager in services).
+end note
 
 @enduml
