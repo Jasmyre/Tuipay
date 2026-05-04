@@ -1,182 +1,151 @@
 @startuml
-title Inventory Management System - Class Diagram
+title Tuipay - Core Structure (Based on Documented Functionalities)
 
-skinparam classAttributeIconSize 0
+package "models" {
 
-' =========================
-' BASE CLASSES (OOP SUPPORT)
-' =========================
+  class Student {
+    - String studentId
+    - String fullName
+    - String password
+    - double tuitionBalance
+    - double walletBalance
+    - List<Transaction> transactions
 
-abstract class Page {
-  + display(): void
+    + topUp(amount: double)
+    + payTuition(amount: double): boolean
+    + addTransaction(transaction: Transaction)
+    + getTransactionHistory(): List<Transaction>
+  }
+
+  class Admin {
+    - String username
+    - String password
+
+    + authenticate(username: String, password: String): boolean
+  }
+
+  class Transaction {
+    - String transactionId
+    - String studentId
+    - TransactionType type
+    - double amount
+    - Date transactionDate
+    - double remainingTuitionBalance
+
+    + generateReceipt(): String
+  }
+
+  enum TransactionType {
+    TOP_UP
+    TUITION_PAYMENT
+  }
 }
 
-abstract class Report {
-  + generateReport(): void
+package "services" {
+
+  class SeedDataService {
+    + seedStudents(): List<Student>
+    + seedAdmin(): Admin
+  }
+
+  class AuthService {
+    - List<Student> students
+    - Admin admin
+
+    + loginStudent(studentId: String, password: String): Student
+    + loginAdmin(username: String, password: String): Admin
+    + logout()
+  }
+
+  class StudentService {
+    + viewStudentDashboard(student: Student): StudentDashboardDTO
+    + topUpWallet(student: Student, amount: double)
+    + payTuition(student: Student, amount: double): boolean
+    + getPaymentHistory(student: Student): List<Transaction>
+  }
+
+  class AdminService {
+    - List<Student> students
+
+    + viewAdminDashboard(): AdminDashboardDTO
+    + getAllStudents(): List<Student>
+    + getAllTransactions(): List<Transaction>
+    + updateTuitionBalance(studentId: String, amount: double)
+  }
+
+  class SessionService {
+    - Student currentStudent
+    - Admin currentAdmin
+
+    + setCurrentStudent(student: Student)
+    + getCurrentStudent(): Student
+    + setCurrentAdmin(admin: Admin)
+    + getCurrentAdmin(): Admin
+    + clearSession()
+  }
+
+  class TransactionService {
+    + createTopUpTransaction(student: Student, amount: double): Transaction
+    + createPaymentTransaction(student: Student, amount: double): Transaction
+    + getAllTransactions(students: List<Student>): List<Transaction>
+  }
+
+  class TemporaryStorageService {
+    - List<Student> students
+    - Admin admin
+    - Map<String, Object> sessionData
+
+    + initializeSeedData()
+    + resetOnAppClose()
+  }
 }
 
-' =========================
-' MODEL CLASSES
-' =========================
+package "dto" {
+  class StudentDashboardDTO {
+    + String fullName
+    + String studentId
+    + double tuitionBalance
+    + double walletBalance
+  }
 
-class Product {
-  - sku: String
-  - name: String
-  - category: String
-  - price: double
-  - quantity: int
-  - reorderLevel: int
-  + Product(sku: String, name: String, category: String, price: double, quantity: int, reorderLevel: int)
-  + getSku(): String
-  + getName(): String
-  + getCategory(): String
-  + getPrice(): double
-  + getQuantity(): int
-  + getReorderLevel(): int
-  + setPrice(price: double): void
-  + setQuantity(quantity: int): void
-  + isLowStock(): boolean
-  + getInventoryValue(): double
+  class AdminDashboardDTO {
+    + int totalStudents
+    + double totalPaymentsMade
+    + double totalRemainingBalances
+  }
 }
 
-class SaleItem {
-  - product: Product
-  - quantity: int
-  - unitPrice: double
-  + SaleItem(product: Product, quantity: int)
-  + getSubtotal(): double
+package "constraints" {
+  note "Demo Prototype Limitations:\n- No real payment gateway integration\n- No real database persistence\n- Session-based temporary data only\n- Seeded accounts only\n- No registration/forgot-password flow" as DemoLimitations
 }
 
-class SaleTransaction {
-  - transactionId: String
-  - date: LocalDateTime
-  - items: ArrayList<SaleItem>
-  - totalAmount: double
-  + SaleTransaction(transactionId: String)
-  + addItem(item: SaleItem): void
-  + calculateTotal(): double
-  + getItems(): ArrayList<SaleItem>
-  + getTotalAmount(): double
-}
+Student "1" *-- "*" Transaction
+Transaction --> TransactionType
 
-' =========================
-' SERVICE CLASSES
-' =========================
+SeedDataService --> Student
+SeedDataService --> Admin
 
-class InventoryManager {
-  - products: ArrayList<Product>
-  + addProduct(product: Product): void
-  + updateProduct(product: Product): void
-  + removeProduct(sku: String): boolean
-  + findProduct(sku: String): Product
-  + getAllProducts(): ArrayList<Product>
-  + restockProduct(sku: String, qty: int): void
-  + reduceStock(sku: String, qty: int): void
-  + getLowStockProducts(): ArrayList<Product>
-  + getOutOfStockProducts(): ArrayList<Product>
-  + getTotalInventoryValue(): double
-}
+AuthService --> Student
+AuthService --> Admin
+AuthService --> SessionService
 
-class SalesManager {
-  - transactions: ArrayList<SaleTransaction>
-  + recordTransaction(tx: SaleTransaction): void
-  + getAllTransactions(): ArrayList<SaleTransaction>
-  + getRecentSales(limit: int): ArrayList<SaleTransaction>
-  + getTotalRevenue(): double
-  + getTotalUnitsSold(): int
-}
+StudentService --> Student
+StudentService --> TransactionService
+StudentService --> StudentDashboardDTO
 
-' =========================
-' REPORT CLASSES
-' =========================
+AdminService --> Student
+AdminService --> TransactionService
+AdminService --> AdminDashboardDTO
 
-class ProductReport
-class SalesReport
-class InventoryReport
+SessionService --> Student
+SessionService --> Admin
 
-Report <|-- ProductReport
-Report <|-- SalesReport
-Report <|-- InventoryReport
+TransactionService --> Transaction
+TransactionService --> Student
 
-' =========================
-' UI PAGES
-' =========================
-
-class LoginPage {
-  - usernameField: JTextField
-  - passwordField: JPasswordField
-  - loginButton: JButton
-  + authenticate(username: String, password: String): boolean
-}
-
-class HomePage {
-  - inventoryManager: InventoryManager
-  - salesManager: SalesManager
-  + showDashboard(): void
-  + openProductsPage(): void
-  + openInventoryPage(): void
-  + openSalesPage(): void
-  + openReportsPage(): void
-}
-
-class ProductsPage {
-  - inventoryManager: InventoryManager
-  + addProduct(): void
-  + updateProduct(): void
-  + deleteProduct(): void
-}
-
-class InventoryPage {
-  - inventoryManager: InventoryManager
-  + showStockLevels(): void
-  + searchProduct(keyword: String): Product
-  + showLowStock(): void
-}
-
-class SalesPage {
-  - salesManager: SalesManager
-  - inventoryManager: InventoryManager
-  + recordSale(): void
-  + displaySalesHistory(): void
-}
-
-class ReportsPage {
-  - inventoryManager: InventoryManager
-  - salesManager: SalesManager
-  + viewProductReport(): void
-  + viewSalesReport(): void
-  + viewInventoryReport(): void
-}
-
-' =========================
-' INHERITANCE (PAGES)
-' =========================
-
-Page <|-- LoginPage
-Page <|-- HomePage
-Page <|-- ProductsPage
-Page <|-- InventoryPage
-Page <|-- SalesPage
-Page <|-- ReportsPage
-
-' =========================
-' RELATIONSHIPS
-' =========================
-
-InventoryManager "1" o-- "*" Product
-SalesManager "1" o-- "*" SaleTransaction
-SaleTransaction "1" o-- "*" SaleItem
-SaleItem "*" --> "1" Product
-
-ProductsPage --> InventoryManager
-InventoryPage --> InventoryManager
-
-SalesPage --> SalesManager
-SalesPage --> InventoryManager
-
-ReportsPage --> InventoryManager
-ReportsPage --> SalesManager
-
-LoginPage --> HomePage
+TemporaryStorageService --> SeedDataService
+TemporaryStorageService --> Student
+TemporaryStorageService --> Admin
+DemoLimitations .. TemporaryStorageService
 
 @enduml
