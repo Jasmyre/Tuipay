@@ -91,16 +91,22 @@ public class AppFrame extends JFrame implements NavigationHandler {
     appPanel.add(header, BorderLayout.NORTH);
 
     pagePanel.setBackground(UITheme.BACKGROUND);
-    studentDashboardPage = new HomePage(this, services);
+    studentDashboardPage = new HomePage(this, services.getStudentService(),
+                                        services.getSessionService());
     addPage(Navigation.HOME, studentDashboardPage);
-    addPage(Navigation.MANAGE_STUDENTS, new PlaceholderPage("Manage Students"));
+    addPage(Navigation.MANAGE_STUDENTS,
+            new ManageStudentsPage(services.getAdminService()));
     addPage(Navigation.VIEW_TRANSACTIONS,
-            new PlaceholderPage("View Transactions"));
-    addPage(Navigation.UPDATE_TUITION, new PlaceholderPage("Update Tuition"));
-    addPage(Navigation.TOP_UP, new PlaceholderPage("Top Up"));
-    addPage(Navigation.PAY_TUITION, new PlaceholderPage("Pay Tuition"));
+            new ViewTransactionsPage(services.getTransactionService(),
+                                     services.getTemporaryStorageService()));
+    addPage(Navigation.UPDATE_TUITION,
+            new UpdateTuitionPage(services.getAdminService()));
+    addPage(Navigation.TOP_UP, new TopUpPage(services.getSessionService()));
+    addPage(Navigation.PAY_TUITION,
+            new PayTuitionPage(services.getSessionService()));
     addPage(Navigation.TRANSACTION_HISTORY,
-            new PlaceholderPage("Transaction History"));
+            new TransactionHistoryPage(services.getStudentService(),
+                                       services.getSessionService()));
 
     appPanel.add(pagePanel, BorderLayout.CENTER);
 
@@ -185,35 +191,5 @@ public class AppFrame extends JFrame implements NavigationHandler {
 
   private boolean isAdminUser() {
     return services.getSessionService().getCurrentAdmin() != null;
-  }
-
-  private static final class PlaceholderPage extends JPanel implements Refreshable {
-    private final JLabel titleLabel = new JLabel();
-
-    private PlaceholderPage(String title) {
-      setLayout(new GridBagLayout());
-      setBackground(UITheme.BACKGROUND);
-
-      JPanel card = UITheme.cardPanel();
-      card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-
-      titleLabel.setText(title);
-      titleLabel.setFont(UITheme.TITLE_FONT);
-      titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-      UITheme.themeLabel(titleLabel);
-
-      JLabel subtitle = new JLabel("Page scaffold ready.");
-      subtitle.setFont(UITheme.SUBTITLE_FONT);
-      subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-      UITheme.themeLabel(subtitle);
-
-      card.add(titleLabel);
-      card.add(Box.createVerticalStrut(8));
-      card.add(subtitle);
-      add(card);
-    }
-
-    @Override
-    public void refresh() {}
   }
 }

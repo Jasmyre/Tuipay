@@ -1,9 +1,10 @@
 package com.store_inventory.pages;
 
-import com.store_inventory.AppServices;
 import com.store_inventory.dto.StudentDashboardDTO;
 import com.store_inventory.models.Student;
 import com.store_inventory.pages.components.UITheme;
+import com.store_inventory.services.SessionService;
+import com.store_inventory.services.StudentService;
 import java.awt.*;
 import java.text.DecimalFormat;
 import javax.swing.*;
@@ -11,15 +12,19 @@ import javax.swing.*;
 public class HomePage extends JPanel implements Refreshable {
   private static final DecimalFormat CURRENCY = new DecimalFormat("#,##0.00");
   private final NavigationHandler navigationHandler;
-  private final AppServices services;
+  private final StudentService studentService;
+  private final SessionService sessionService;
   private final JLabel studentNameValue = new JLabel("-");
   private final JLabel studentIdValue = new JLabel("-");
   private final JLabel tuitionBalanceValue = new JLabel("PHP 0.00");
   private final JLabel walletBalanceValue = new JLabel("PHP 0.00");
 
-  public HomePage(NavigationHandler navigationHandler, AppServices services) {
+  public HomePage(NavigationHandler navigationHandler,
+                  StudentService studentService,
+                  SessionService sessionService) {
     this.navigationHandler = navigationHandler;
-    this.services = services;
+    this.studentService = studentService;
+    this.sessionService = sessionService;
     setLayout(new BorderLayout());
     setBackground(UITheme.BACKGROUND);
 
@@ -195,16 +200,15 @@ public class HomePage extends JPanel implements Refreshable {
       setDashboardData(new StudentDashboardDTO("-", "-", 0, 0));
       return;
     }
-    setDashboardData(services.getStudentService().viewStudentDashboard(
-        currentStudent));
+    setDashboardData(studentService.viewStudentDashboard(currentStudent));
   }
 
   private Student resolveCurrentStudent() {
-    if (services == null || services.getSessionService() == null) {
+    if (sessionService == null) {
       return null;
     }
 
-    return services.getSessionService().getCurrentStudent();
+    return sessionService.getCurrentStudent();
   }
 
   private String formatCurrency(double amount) {

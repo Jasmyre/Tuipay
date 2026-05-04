@@ -101,6 +101,17 @@ package "services" {
   }
 }
 
+package "pages" {
+  class AppFrame
+  class HomePage
+  class ManageStudentsPage
+  class ViewTransactionsPage
+  class UpdateTuitionPage
+  class TopUpPage
+  class PayTuitionPage
+  class TransactionHistoryPage
+}
+
 package "dto" {
   class StudentDashboardDTO {
     + String fullName
@@ -148,5 +159,23 @@ TemporaryStorageService --> SeedDataService
 TemporaryStorageService --> Student
 TemporaryStorageService --> Admin
 DemoLimitations .. TemporaryStorageService
+
+AppFrame --> AuthService
+AppFrame --> SessionService
+AppFrame --> StudentService
+AppFrame --> AdminService
+AppFrame --> TransactionService
+AppFrame --> TemporaryStorageService
+
+HomePage --> StudentService
+HomePage --> SessionService
+ManageStudentsPage --> AdminService
+ViewTransactionsPage --> TransactionService
+ViewTransactionsPage --> TemporaryStorageService
+UpdateTuitionPage --> AdminService
+TopUpPage --> SessionService
+PayTuitionPage --> SessionService
+TransactionHistoryPage --> StudentService
+TransactionHistoryPage --> SessionService
 
 @enduml
