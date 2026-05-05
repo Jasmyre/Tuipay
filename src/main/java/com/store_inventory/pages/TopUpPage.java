@@ -182,8 +182,14 @@ public class TopUpPage extends JPanel implements Refreshable {
 
     JPanel card = UITheme.cardPanel();
     card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-    card.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
- 
+    card.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+
+    JPanel headerPanel = new JPanel();
+    headerPanel.setOpaque(false);
+    headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+    headerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+
     JLabel title = new JLabel(provider.getDisplayName() + " Checkout");
     title.setFont(UITheme.SUBTITLE_FONT);
     title.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -195,29 +201,37 @@ public class TopUpPage extends JPanel implements Refreshable {
     subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
     subtitle.setForeground(UITheme.MUTED_TEXT);
 
+    headerPanel.add(title);
+    headerPanel.add(Box.createVerticalStrut(4));
+    headerPanel.add(subtitle);
+    headerPanel.add(Box.createVerticalStrut(16));
+
     final double[] amount = new double[] {500};
     JPanel amountPanel = new JPanel();
     amountPanel.setOpaque(false);
     amountPanel.setLayout(new BoxLayout(amountPanel, BoxLayout.Y_AXIS));
     amountPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-    amountPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 170));
-    amountPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+    amountPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
 
-    JLabel amountLabel = new JLabel("Amount (PHP)");
+    JLabel amountLabel = new JLabel("Amount PHP");
     amountLabel.setFont(UITheme.LABEL_FONT);
     amountLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
     UITheme.themeLabel(amountLabel);
 
     JLabel amountValue = new JLabel("PHP " + CURRENCY.format(amount[0]));
     amountValue.setFont(UITheme.customFont(UITheme.FONT_FAMILY,
-                                           UITheme.FONT_WEIGHT_TITLE, 26));
+                                           UITheme.FONT_WEIGHT_TITLE, 30));
     amountValue.setAlignmentX(Component.LEFT_ALIGNMENT);
     UITheme.themeLabel(amountValue);
 
-    JPanel controls = new JPanel(new GridLayout(1, 5, 8, 0));
+    amountPanel.add(amountLabel);
+    amountPanel.add(Box.createVerticalStrut(8));
+    amountPanel.add(amountValue);
+
+    JPanel controls = new JPanel(new GridLayout(1, 5, 10, 10));
     controls.setOpaque(false);
     controls.setAlignmentX(Component.LEFT_ALIGNMENT);
-    controls.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+    controls.setMaximumSize(new Dimension(Integer.MAX_VALUE, 46));
 
     JButton minusOneButton = UITheme.secondaryButton("-1");
     JButton minusHundredButton = UITheme.secondaryButton("-100");
@@ -252,21 +266,10 @@ public class TopUpPage extends JPanel implements Refreshable {
     controls.add(plusHundredButton);
     controls.add(plusOneButton);
 
-    amountPanel.add(amountLabel);
-    amountPanel.add(Box.createVerticalStrut(6));
-    amountPanel.add(amountValue);
-    amountPanel.add(Box.createVerticalStrut(8));
-    amountPanel.add(controls);
-
-    card.add(title);
-    card.add(Box.createVerticalStrut(4));
-    card.add(subtitle);
-    card.add(Box.createVerticalStrut(12));
-    card.add(amountPanel);
-
-    JPanel actions = new JPanel();
+    JPanel actions = new JPanel(new GridLayout(1, 2, 20, 0));
     actions.setOpaque(false);
-    actions.setLayout(new BoxLayout(actions, BoxLayout.X_AXIS));
+    actions.setAlignmentX(Component.LEFT_ALIGNMENT);
+    actions.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
 
     JButton cancelButton = UITheme.secondaryButton("Cancel");
     JButton submitButton = UITheme.primaryButton("Top Up Now");
@@ -274,17 +277,20 @@ public class TopUpPage extends JPanel implements Refreshable {
     submitButton.addActionListener(e -> submitTopUp(dialog, provider, amount[0]));
 
     actions.add(cancelButton);
-    actions.add(Box.createHorizontalStrut(8));
     actions.add(submitButton);
-    actions.add(Box.createHorizontalGlue());
 
-    card.add(Box.createVerticalStrut(12));
+    card.add(headerPanel);
+    card.add(amountPanel);
+    card.add(Box.createVerticalStrut(20));
+    card.add(controls);
+    card.add(Box.createVerticalGlue());
+    card.add(Box.createVerticalStrut(20));
     card.add(actions);
 
     root.add(card, BorderLayout.CENTER);
     dialog.setContentPane(root);
     dialog.pack();
-    dialog.setSize(new Dimension(560, 420));
+    dialog.setSize(new Dimension(650, 450));
     dialog.setLocationRelativeTo(this);
     dialog.setResizable(false);
     dialog.setVisible(true);
