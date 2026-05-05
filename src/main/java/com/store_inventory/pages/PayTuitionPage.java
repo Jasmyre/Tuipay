@@ -309,8 +309,8 @@ public class PayTuitionPage extends JPanel implements Refreshable {
     JButton submitButton = UITheme.primaryButton("Pay Tuition Now");
     cancelButton.addActionListener(e -> dialog.dispose());
     submitButton.addActionListener(e -> {
-      processPayment(amount[0]);
       dialog.dispose();
+      processPayment(amount[0]);
     });
 
     actions.add(cancelButton);
@@ -359,16 +359,20 @@ public class PayTuitionPage extends JPanel implements Refreshable {
 
     JPanel root = new JPanel(new BorderLayout());
     root.setBackground(UITheme.BACKGROUND);
-    root.setBorder(BorderFactory.createEmptyBorder(14, 14, 14, 14));
 
     JPanel card = UITheme.cardPanel();
     card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-    card.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+    card.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+    JPanel headerPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
+    headerPanel.setOpaque(false);
+    headerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
 
     JLabel title = new JLabel("Receipt Preview");
     title.setFont(UITheme.SUBTITLE_FONT);
-    title.setAlignmentX(Component.LEFT_ALIGNMENT);
     UITheme.themeLabel(title);
+    headerPanel.add(title);
 
     String receiptBody = buildReceiptContent(student, transaction, paidAmount);
     JTextArea receiptArea = new JTextArea(receiptBody);
@@ -385,20 +389,32 @@ public class PayTuitionPage extends JPanel implements Refreshable {
     receiptArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
     JScrollPane receiptScroll = new JScrollPane(receiptArea);
-    receiptScroll.setAlignmentX(Component.LEFT_ALIGNMENT);
-    receiptScroll.setPreferredSize(new Dimension(520, 220));
-    receiptScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, 260));
+    receiptScroll.setVerticalScrollBarPolicy(
+        ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+    receiptScroll.setHorizontalScrollBarPolicy(
+        ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
     UITheme.themeScrollPane(receiptScroll);
 
-    JPanel actions = new JPanel();
+    JPanel receiptContentPanel = new JPanel(new BorderLayout());
+    receiptContentPanel.setOpaque(false);
+    receiptContentPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    receiptContentPanel.add(receiptScroll, BorderLayout.CENTER);
+
+    JPanel actions = new JPanel(new GridLayout(1, 2, 20, 0));
     actions.setOpaque(false);
-    actions.setLayout(new BoxLayout(actions, BoxLayout.X_AXIS));
+    actions.setAlignmentX(Component.LEFT_ALIGNMENT);
+    actions.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
 
     JButton closeButton = UITheme.secondaryButton("Close");
-    JButton saveAndBackButton = UITheme.primaryButton("Save to /export and Back");
+    JButton saveButton = UITheme.primaryButton("Save");
 
-    closeButton.addActionListener(e -> dialog.dispose());
-    saveAndBackButton.addActionListener(e -> {
+    closeButton.addActionListener(e -> {
+      closeDialogChain(dialog);
+      if (navigationHandler != null) {
+        navigationHandler.navigate(Navigation.STUDENT_PAGE);
+      }
+    });
+    saveButton.addActionListener(e -> {
       try {
         Path savedFile = saveReceiptToExport(student, receiptBody);
         JOptionPane.showMessageDialog(
@@ -406,7 +422,7 @@ public class PayTuitionPage extends JPanel implements Refreshable {
             "Receipt saved to:\n" + savedFile.toString(),
             "Saved",
             JOptionPane.INFORMATION_MESSAGE);
-        dialog.dispose();
+        closeDialogChain(dialog);
         if (navigationHandler != null) {
           navigationHandler.navigate(Navigation.STUDENT_PAGE);
         }
@@ -419,20 +435,18 @@ public class PayTuitionPage extends JPanel implements Refreshable {
     });
 
     actions.add(closeButton);
-    actions.add(Box.createHorizontalStrut(8));
-    actions.add(saveAndBackButton);
-    actions.add(Box.createHorizontalGlue());
+    actions.add(saveButton);
 
-    card.add(title);
+    card.add(headerPanel);
     card.add(Box.createVerticalStrut(8));
-    card.add(receiptScroll);
+    card.add(receiptContentPanel);
     card.add(Box.createVerticalStrut(10));
     card.add(actions);
 
     root.add(card, BorderLayout.CENTER);
     dialog.setContentPane(root);
     dialog.pack();
-    dialog.setSize(new Dimension(620, 460));
+    dialog.setSize(new Dimension(600, 400));
     dialog.setLocationRelativeTo(this);
     dialog.setResizable(false);
     dialog.setVisible(true);
@@ -476,6 +490,16 @@ public class PayTuitionPage extends JPanel implements Refreshable {
 
   private void syncAmountLabel(JLabel amountValue, double amount) {
     amountValue.setText("PHP " + CURRENCY.format(amount));
+  }
+
+  private void closeDialogChain(Dialog dialog) {
+    Dialog current = dialog;
+    while (current != null) {
+      Dialog ownerDialog = current.getOwner() instanceof Dialog
+          ? (Dialog) current.getOwner() : null;
+      current.dispose();
+      current = ownerDialog;
+    }
   }
 
   private double getCurrentMaxPayable() {
