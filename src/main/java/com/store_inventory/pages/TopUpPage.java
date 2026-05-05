@@ -1,6 +1,7 @@
 package com.store_inventory.pages;
 
 import com.store_inventory.models.Student;
+import com.store_inventory.pages.components.DialogTitleBar;
 import com.store_inventory.pages.components.UITheme;
 import com.store_inventory.services.AppServices;
 import com.store_inventory.services.TopUpProviderRegistry;
@@ -175,10 +176,16 @@ public class TopUpPage extends JPanel implements Refreshable {
         "Top Up via " + provider.getDisplayName(),
         Dialog.ModalityType.APPLICATION_MODAL);
     dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+    dialog.setUndecorated(true);
 
     JPanel root = new JPanel(new BorderLayout());
     root.setBackground(UITheme.BACKGROUND);
-    root.setBorder(BorderFactory.createEmptyBorder(14, 14, 14, 14));
+    root.add(new DialogTitleBar(dialog, "Top Up via " + provider.getDisplayName()),
+             BorderLayout.NORTH);
+
+    JPanel contentWrap = new JPanel(new BorderLayout());
+    contentWrap.setOpaque(false);
+    contentWrap.setBorder(BorderFactory.createEmptyBorder(14, 14, 14, 14));
 
     JPanel card = UITheme.cardPanel();
     card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
@@ -287,7 +294,8 @@ public class TopUpPage extends JPanel implements Refreshable {
     card.add(Box.createVerticalStrut(20));
     card.add(actions);
 
-    root.add(card, BorderLayout.CENTER);
+    contentWrap.add(card, BorderLayout.CENTER);
+    root.add(contentWrap, BorderLayout.CENTER);
     dialog.setContentPane(root);
     dialog.pack();
     dialog.setSize(new Dimension(650, 450));
