@@ -29,7 +29,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 
@@ -45,7 +44,6 @@ public class PayTuitionPage extends JPanel implements Refreshable {
   private final JLabel tuitionBalanceValue = new JLabel("PHP 0.00");
   private final JLabel walletBalanceValue = new JLabel("PHP 0.00");
   private final JLabel maxPayableValue = new JLabel("PHP 0.00");
-  private final JTextField amountField = new JTextField("0.00");
 
   public PayTuitionPage(AppServices appServices,
                         NavigationHandler navigationHandler) {
@@ -59,9 +57,19 @@ public class PayTuitionPage extends JPanel implements Refreshable {
     content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
     content.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-    content.add(buildSummaryCard());
-    content.add(Box.createVerticalStrut(12));
-    content.add(buildPaymentCard());
+    JPanel headerPanel = buildHeaderPanel();
+    headerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    JPanel balanceContainer = buildBalanceContainer();
+    balanceContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+    JPanel actionPanel = buildActionPanel();
+    actionPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+    content.add(headerPanel);
+    content.add(Box.createVerticalStrut(16));
+    content.add(balanceContainer);
+    content.add(Box.createVerticalStrut(16));
+    content.add(actionPanel);
+    content.add(Box.createVerticalGlue());
 
     JScrollPane scrollPane = new JScrollPane(content);
     scrollPane.setOpaque(false);
@@ -75,9 +83,10 @@ public class PayTuitionPage extends JPanel implements Refreshable {
     refresh();
   }
 
-  private JPanel buildSummaryCard() {
-    JPanel card = UITheme.cardPanel();
-    card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+  private JPanel buildHeaderPanel() {
+    JPanel header = new JPanel();
+    header.setOpaque(false);
+    header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
 
     JLabel title = new JLabel("Pay Tuition");
     title.setFont(UITheme.TITLE_FONT);
@@ -89,95 +98,59 @@ public class PayTuitionPage extends JPanel implements Refreshable {
     subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
     subtitle.setForeground(UITheme.MUTED_TEXT);
 
-    JPanel row = new JPanel(new GridLayout(1, 3, 10, 0));
-    row.setOpaque(false);
-    row.setAlignmentX(Component.LEFT_ALIGNMENT);
+    header.add(title);
+    header.add(Box.createVerticalStrut(4));
+    header.add(subtitle);
+    return header;
+  }
+
+  private JPanel buildBalanceContainer() {
+    JPanel container = new JPanel(new GridLayout(1, 3, 20, 0));
+    container.setOpaque(false);
 
     styleSummaryValue(tuitionBalanceValue);
     styleSummaryValue(walletBalanceValue);
     styleSummaryValue(maxPayableValue);
 
-    row.add(UITheme.statCard("Tuition Balance", tuitionBalanceValue));
-    row.add(UITheme.statCard("Wallet Balance", walletBalanceValue));
-    row.add(UITheme.statCard("Amount To Pay", maxPayableValue));
+    container.add(buildBalanceCard(tuitionBalanceValue, "Tuition Balance"));
+    container.add(buildBalanceCard(walletBalanceValue, "Wallet Balance"));
+    container.add(buildBalanceCard(maxPayableValue, "Amount To Pay"));
+    return container;
+  }
 
-    card.add(title);
-    card.add(Box.createVerticalStrut(4));
-    card.add(subtitle);
-    card.add(Box.createVerticalStrut(12));
-    card.add(row);
+  private JPanel buildBalanceCard(JLabel valueLabel, String caption) {
+    JPanel card = UITheme.cardPanel();
+    card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+    valueLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+    JLabel small = new JLabel(caption);
+    small.setFont(UITheme.LABEL_FONT);
+    small.setAlignmentX(Component.LEFT_ALIGNMENT);
+    small.setForeground(UITheme.MUTED_TEXT);
+
+    card.add(valueLabel);
+    card.add(Box.createVerticalStrut(6));
+    card.add(small);
     return card;
   }
 
-  private JPanel buildPaymentCard() {
-    JPanel card = UITheme.cardPanel();
-    card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+  private JPanel buildActionPanel() {
+    JPanel actionPanel = new JPanel(new GridLayout(1, 2, 20, 0));
+    actionPanel.setOpaque(false);
 
-    JLabel formTitle = new JLabel("Payment Form");
-    formTitle.setFont(UITheme.SUBTITLE_FONT);
-    formTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-    UITheme.themeLabel(formTitle);
+    JButton backButton = UITheme.secondaryButton("Back to Dashboard");
+    JButton proceedButton = UITheme.primaryButton("Proceed to Payment");
 
-    JLabel formHint = new JLabel("Enter amount then confirm payment");
-    formHint.setFont(UITheme.customFont(UITheme.FONT_FAMILY,
-                                        UITheme.FONT_WEIGHT_LABEL, 13));
-    formHint.setAlignmentX(Component.LEFT_ALIGNMENT);
-    formHint.setForeground(UITheme.MUTED_TEXT);
+    backButton.addActionListener(e -> {
+      if (navigationHandler != null) {
+        navigationHandler.navigate(Navigation.STUDENT_PAGE);
+      }
+    });
+    proceedButton.addActionListener(e -> openPaymentDialog());
 
-    JLabel amountLabel = new JLabel("Amount to Pay (PHP)");
-    amountLabel.setFont(UITheme.LABEL_FONT);
-    amountLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-    UITheme.themeLabel(amountLabel);
-
-    UITheme.themeTextField(amountField);
-    amountField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
-
-    JPanel quickActions = new JPanel(new GridLayout(1, 4, 8, 0));
-    quickActions.setOpaque(false);
-    quickActions.setAlignmentX(Component.LEFT_ALIGNMENT);
-    quickActions.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
-
-    JButton add100Button = UITheme.secondaryButton("+100");
-    JButton add500Button = UITheme.secondaryButton("+500");
-    JButton add1000Button = UITheme.secondaryButton("+1000");
-    JButton payFullButton = UITheme.secondaryButton("Pay Full");
-
-    add100Button.addActionListener(e -> adjustAmount(100));
-    add500Button.addActionListener(e -> adjustAmount(500));
-    add1000Button.addActionListener(e -> adjustAmount(1000));
-    payFullButton.addActionListener(e -> setAmountToMax());
-
-    quickActions.add(add100Button);
-    quickActions.add(add500Button);
-    quickActions.add(add1000Button);
-    quickActions.add(payFullButton);
-
-    JPanel actions = new JPanel();
-    actions.setOpaque(false);
-    actions.setLayout(new BoxLayout(actions, BoxLayout.X_AXIS));
-
-    JButton clearButton = UITheme.secondaryButton("Clear");
-    JButton payButton = UITheme.primaryButton("Pay Tuition");
-    clearButton.addActionListener(e -> amountField.setText("0.00"));
-    payButton.addActionListener(e -> processPayment());
-
-    actions.add(clearButton);
-    actions.add(Box.createHorizontalStrut(8));
-    actions.add(payButton);
-    actions.add(Box.createHorizontalGlue());
-
-    card.add(formTitle);
-    card.add(Box.createVerticalStrut(2));
-    card.add(formHint);
-    card.add(Box.createVerticalStrut(10));
-    card.add(amountLabel);
-    card.add(Box.createVerticalStrut(6));
-    card.add(amountField);
-    card.add(Box.createVerticalStrut(8));
-    card.add(quickActions);
-    card.add(Box.createVerticalStrut(10));
-    card.add(actions);
-    return card;
+    actionPanel.add(backButton);
+    actionPanel.add(proceedButton);
+    return actionPanel;
   }
 
   private void styleSummaryValue(JLabel label) {
@@ -186,19 +159,7 @@ public class PayTuitionPage extends JPanel implements Refreshable {
     UITheme.themeLabel(label);
   }
 
-  private void adjustAmount(double delta) {
-    Double current = parseAmount(amountField.getText());
-    double base = current == null ? 0 : current;
-    double maxPayable = getCurrentMaxPayable();
-    double next = Math.max(0, Math.min(maxPayable, base + delta));
-    amountField.setText(CURRENCY.format(next));
-  }
-
-  private void setAmountToMax() {
-    amountField.setText(CURRENCY.format(getCurrentMaxPayable()));
-  }
-
-  private void processPayment() {
+  private void processPayment(double amount) {
     Student student = appServices.getCurrentStudent();
     if (student == null) {
       JOptionPane.showMessageDialog(this,
@@ -208,8 +169,7 @@ public class PayTuitionPage extends JPanel implements Refreshable {
       return;
     }
 
-    Double parsed = parseAmount(amountField.getText());
-    if (parsed == null || parsed <= 0) {
+    if (amount <= 0) {
       JOptionPane.showMessageDialog(this,
                                     "Enter a valid amount greater than zero.",
                                     "Payment Error",
@@ -227,7 +187,7 @@ public class PayTuitionPage extends JPanel implements Refreshable {
       return;
     }
 
-    if (parsed > maxPayable) {
+    if (amount > maxPayable) {
       JOptionPane.showMessageDialog(this,
                                     "Amount exceeds your payable balance (PHP "
                                     + CURRENCY.format(maxPayable) + ").",
@@ -236,7 +196,7 @@ public class PayTuitionPage extends JPanel implements Refreshable {
       return;
     }
 
-    boolean success = appServices.getStudentManager().payTuition(student, parsed);
+    boolean success = appServices.getStudentManager().payTuition(student, amount);
     if (!success) {
       JOptionPane.showMessageDialog(this,
                                     "Unable to process tuition payment.",
@@ -246,9 +206,138 @@ public class PayTuitionPage extends JPanel implements Refreshable {
     }
 
     refresh();
-    amountField.setText("0.00");
     Transaction transaction = latestPaymentTransaction(student);
-    showReceiptDialog(student, transaction, parsed);
+    showReceiptDialog(student, transaction, amount);
+  }
+
+  private void openPaymentDialog() {
+    double maxPayable = getCurrentMaxPayable();
+    if (maxPayable <= 0) {
+      JOptionPane.showMessageDialog(this,
+                                    "No payable amount. Check tuition and wallet balance.",
+                                    "Payment Error",
+                                    JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+
+    JDialog dialog = new JDialog(
+        SwingUtilities.getWindowAncestor(this),
+        "Proceed to Payment",
+        Dialog.ModalityType.APPLICATION_MODAL);
+    dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+
+    JPanel root = new JPanel(new BorderLayout());
+    root.setBackground(UITheme.BACKGROUND);
+    root.setBorder(BorderFactory.createEmptyBorder(14, 14, 14, 14));
+
+    JPanel card = UITheme.cardPanel();
+    card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+    card.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+
+    JLabel title = new JLabel("Tuition Payment Checkout");
+    title.setFont(UITheme.SUBTITLE_FONT);
+    title.setAlignmentX(Component.LEFT_ALIGNMENT);
+    UITheme.themeLabel(title);
+
+    JLabel subtitle = new JLabel("Set amount and confirm tuition payment");
+    subtitle.setFont(UITheme.customFont(UITheme.FONT_FAMILY,
+                                        UITheme.FONT_WEIGHT_LABEL, 13));
+    subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+    subtitle.setForeground(UITheme.MUTED_TEXT);
+
+    final double[] amount = new double[] {maxPayable};
+    JLabel amountLabel = new JLabel("Amount PHP");
+    amountLabel.setFont(UITheme.LABEL_FONT);
+    amountLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    UITheme.themeLabel(amountLabel);
+
+    JLabel amountValue = new JLabel("PHP " + CURRENCY.format(amount[0]));
+    amountValue.setFont(UITheme.customFont(
+        UITheme.FONT_FAMILY, UITheme.FONT_WEIGHT_TITLE, 30));
+    amountValue.setAlignmentX(Component.LEFT_ALIGNMENT);
+    UITheme.themeLabel(amountValue);
+
+    JLabel maxHint = new JLabel("Maximum payable: PHP " + CURRENCY.format(maxPayable));
+    maxHint.setFont(UITheme.LABEL_FONT);
+    maxHint.setAlignmentX(Component.LEFT_ALIGNMENT);
+    maxHint.setForeground(UITheme.MUTED_TEXT);
+
+    JPanel controls = new JPanel(new GridLayout(1, 5, 10, 10));
+    controls.setOpaque(false);
+    controls.setAlignmentX(Component.LEFT_ALIGNMENT);
+    controls.setMaximumSize(new Dimension(Integer.MAX_VALUE, 46));
+
+    JButton minusOneButton = UITheme.secondaryButton("-1");
+    JButton minusHundredButton = UITheme.secondaryButton("-100");
+    JButton resetButton = UITheme.secondaryButton("0");
+    JButton plusHundredButton = UITheme.secondaryButton("+100");
+    JButton plusOneButton = UITheme.secondaryButton("+1");
+
+    minusOneButton.addActionListener(e -> {
+      amount[0] = clampAmount(amount[0] - 1, maxPayable);
+      syncAmountLabel(amountValue, amount[0]);
+    });
+    minusHundredButton.addActionListener(e -> {
+      amount[0] = clampAmount(amount[0] - 100, maxPayable);
+      syncAmountLabel(amountValue, amount[0]);
+    });
+    resetButton.addActionListener(e -> {
+      amount[0] = 0;
+      syncAmountLabel(amountValue, amount[0]);
+    });
+    plusHundredButton.addActionListener(e -> {
+      amount[0] = clampAmount(amount[0] + 100, maxPayable);
+      syncAmountLabel(amountValue, amount[0]);
+    });
+    plusOneButton.addActionListener(e -> {
+      amount[0] = clampAmount(amount[0] + 1, maxPayable);
+      syncAmountLabel(amountValue, amount[0]);
+    });
+
+    controls.add(minusOneButton);
+    controls.add(minusHundredButton);
+    controls.add(resetButton);
+    controls.add(plusHundredButton);
+    controls.add(plusOneButton);
+
+    JPanel actions = new JPanel(new GridLayout(1, 2, 20, 0));
+    actions.setOpaque(false);
+    actions.setAlignmentX(Component.LEFT_ALIGNMENT);
+    actions.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+
+    JButton cancelButton = UITheme.secondaryButton("Cancel");
+    JButton submitButton = UITheme.primaryButton("Pay Tuition Now");
+    cancelButton.addActionListener(e -> dialog.dispose());
+    submitButton.addActionListener(e -> {
+      processPayment(amount[0]);
+      dialog.dispose();
+    });
+
+    actions.add(cancelButton);
+    actions.add(submitButton);
+
+    card.add(title);
+    card.add(Box.createVerticalStrut(4));
+    card.add(subtitle);
+    card.add(Box.createVerticalStrut(16));
+    card.add(amountLabel);
+    card.add(Box.createVerticalStrut(8));
+    card.add(amountValue);
+    card.add(Box.createVerticalStrut(4));
+    card.add(maxHint);
+    card.add(Box.createVerticalStrut(20));
+    card.add(controls);
+    card.add(Box.createVerticalGlue());
+    card.add(Box.createVerticalStrut(20));
+    card.add(actions);
+
+    root.add(card, BorderLayout.CENTER);
+    dialog.setContentPane(root);
+    dialog.pack();
+    dialog.setSize(new Dimension(650, 450));
+    dialog.setLocationRelativeTo(this);
+    dialog.setResizable(false);
+    dialog.setVisible(true);
   }
 
   private Transaction latestPaymentTransaction(Student student) {
@@ -381,19 +470,12 @@ public class PayTuitionPage extends JPanel implements Refreshable {
     return file.toAbsolutePath();
   }
 
-  private Double parseAmount(String raw) {
-    if (raw == null) {
-      return null;
-    }
-    String cleaned = raw.replace(",", "").trim();
-    if (cleaned.isEmpty()) {
-      return null;
-    }
-    try {
-      return Double.parseDouble(cleaned);
-    } catch (NumberFormatException ex) {
-      return null;
-    }
+  private double clampAmount(double value, double maxPayable) {
+    return Math.max(0, Math.min(maxPayable, value));
+  }
+
+  private void syncAmountLabel(JLabel amountValue, double amount) {
+    amountValue.setText("PHP " + CURRENCY.format(amount));
   }
 
   private double getCurrentMaxPayable() {
