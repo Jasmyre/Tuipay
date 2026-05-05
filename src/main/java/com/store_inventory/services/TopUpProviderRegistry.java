@@ -5,11 +5,11 @@ import java.util.List;
 public final class TopUpProviderRegistry {
   private static final List<TopUpProvider> PROVIDERS = List.of(
       new TopUpProvider("maya", "Maya", "E-Wallet",
-                        "Maya Mobile Number", "11-digit number", 11, 11),
+                        "Maya Mobile Number", "Continue with Maya", 11, 11),
       new TopUpProvider("gcash", "GCash", "E-Wallet",
-                        "GCash Mobile Number", "11-digit number", 11, 11),
-      new TopUpProvider("chinabank", "China Bank", "Online Banking",
-                        "China Bank Account Number", "10-16 digit account", 10, 16));
+                        "GCash Mobile Number", "Continue with GCash", 11, 11),
+      new TopUpProvider("china_bank", "China Bank", "Online Banking",
+                        "China Bank Account Number", "Continue with China Bank", 10, 16));
 
   private TopUpProviderRegistry() {}
 

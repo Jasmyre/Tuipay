@@ -128,8 +128,8 @@ public class TopUpPage extends JPanel implements Refreshable {
   private JPanel buildProviderTile(TopUpProviderRegistry.TopUpProvider provider) {
     JPanel tile = UITheme.cardPanel();
     tile.setLayout(new BoxLayout(tile, BoxLayout.Y_AXIS));
-    tile.setPreferredSize(new Dimension(220, 210));
-    tile.setMaximumSize(new Dimension(Integer.MAX_VALUE, 220));
+    tile.setPreferredSize(new Dimension(200, 190));
+    tile.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
 
     JLabel name = new JLabel(provider.getDisplayName());
     name.setFont(UITheme.SUBTITLE_FONT);
@@ -159,11 +159,11 @@ public class TopUpPage extends JPanel implements Refreshable {
     tile.add(name);
     tile.add(Box.createVerticalStrut(2));
     tile.add(channel);
-    tile.add(Box.createVerticalStrut(6));
+    tile.add(Box.createVerticalStrut(4));
     tile.add(logo);
-    tile.add(Box.createVerticalStrut(6));
+    tile.add(Box.createVerticalStrut(4));
     tile.add(hint);
-    tile.add(Box.createVerticalStrut(8));
+    tile.add(Box.createVerticalStrut(6));
     tile.add(button);
 
     return tile;
@@ -354,16 +354,16 @@ public class TopUpPage extends JPanel implements Refreshable {
 
   private JLabel providerLogo(TopUpProviderRegistry.TopUpProvider provider) {
     JLabel logo = new JLabel();
-    logo.setPreferredSize(new Dimension(108, 108));
-    logo.setMinimumSize(new Dimension(108, 108));
-    logo.setMaximumSize(new Dimension(108, 108));
+    logo.setPreferredSize(new Dimension(0, 86));
+    logo.setMinimumSize(new Dimension(0, 86));
+    logo.setMaximumSize(new Dimension(Integer.MAX_VALUE, 86));
     logo.setOpaque(true);
     logo.setBackground(UITheme.SUMMARY_CARD_BACKGROUND);
     logo.setBorder(UITheme.roundedBorder(UITheme.BORDER, 1, UITheme.RADIUS_MD));
     logo.setHorizontalAlignment(JLabel.CENTER);
     logo.setVerticalAlignment(JLabel.CENTER);
 
-    ImageIcon icon = resolveProviderIcon(provider.getKey(), 96, 96);
+    ImageIcon icon = resolveProviderIcon(provider.getKey(), 72, 72);
     if (icon != null) {
       logo.setIcon(icon);
       logo.setText("");

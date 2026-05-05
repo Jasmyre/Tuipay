@@ -84,8 +84,7 @@ public class PayTuitionPage extends JPanel implements Refreshable {
   }
 
   private JPanel buildHeaderPanel() {
-    JPanel header = new JPanel();
-    header.setOpaque(false);
+    JPanel header = UITheme.cardPanel();
     header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
 
     JLabel title = new JLabel("Pay Tuition");
