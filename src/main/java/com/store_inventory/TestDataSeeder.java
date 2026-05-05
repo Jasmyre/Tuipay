@@ -21,27 +21,6 @@ public final class TestDataSeeder {
 
     Student student01 = studentManager.findStudentById("202509-0033");
     Student student02 = studentManager.findStudentById("202311-1002");
-
-    if (student01 != null && student01.getTransactionHistory().isEmpty()) {
-      studentManager.topUpWallet(student01, 1000);
-      studentManager.payTuition(student01, 2500);
-      studentManager.topUpWallet(student01, 1000);
-      studentManager.payTuition(student01, 2500);
-      studentManager.topUpWallet(student01, 1000);
-      studentManager.payTuition(student01, 2500);
-      studentManager.topUpWallet(student01, 1000);
-      studentManager.payTuition(student01, 2500);
-      studentManager.topUpWallet(student01, 1000);
-      studentManager.payTuition(student01, 2500);
-      studentManager.topUpWallet(student01, 1000);
-      studentManager.payTuition(student01, 2500);
-    }
-
-    if (student02 != null && student02.getTransactionHistory().isEmpty()) {
-      studentManager.topUpWallet(student02, 3000);
-      studentManager.payTuition(student02, 2000);
-      studentManager.payTuition(student02, 10000);
-    }
   }
 
   private static void seedStudent(StudentManager studentManager,
