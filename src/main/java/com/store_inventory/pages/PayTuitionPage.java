@@ -8,6 +8,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -134,11 +135,13 @@ public class PayTuitionPage extends JPanel implements Refreshable {
   }
 
   private JPanel buildActionPanel() {
-    JPanel actionPanel = new JPanel(new GridLayout(1, 2, 20, 0));
+    JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
     actionPanel.setOpaque(false);
 
     JButton backButton = UITheme.secondaryButton("Back to Dashboard");
     JButton proceedButton = UITheme.primaryButton("Proceed to Payment");
+    applyCompactButtonSize(backButton, 190);
+    applyCompactButtonSize(proceedButton, 190);
 
     backButton.addActionListener(e -> {
       if (navigationHandler != null) {
@@ -233,16 +236,8 @@ public class PayTuitionPage extends JPanel implements Refreshable {
     card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
     card.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-    JLabel title = new JLabel("Tuition Payment Checkout");
-    title.setFont(UITheme.SUBTITLE_FONT);
-    title.setAlignmentX(Component.LEFT_ALIGNMENT);
-    UITheme.themeLabel(title);
-
-    JLabel subtitle = new JLabel("Set amount and confirm tuition payment");
-    subtitle.setFont(UITheme.customFont(UITheme.FONT_FAMILY,
-                                        UITheme.FONT_WEIGHT_LABEL, 13));
-    subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-    subtitle.setForeground(UITheme.MUTED_TEXT);
+    JPanel header = buildDialogHeader("Tuition Payment Checkout",
+                                      "Set amount and confirm tuition payment");
 
     final double[] amount = new double[] {maxPayable};
     JLabel amountLabel = new JLabel("Amount PHP");
@@ -299,13 +294,14 @@ public class PayTuitionPage extends JPanel implements Refreshable {
     controls.add(plusHundredButton);
     controls.add(plusOneButton);
 
-    JPanel actions = new JPanel(new GridLayout(1, 2, 20, 0));
+    JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
     actions.setOpaque(false);
     actions.setAlignmentX(Component.LEFT_ALIGNMENT);
-    actions.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
 
     JButton cancelButton = UITheme.secondaryButton("Cancel");
     JButton submitButton = UITheme.primaryButton("Pay Tuition Now");
+    applyCompactButtonSize(cancelButton, 140);
+    applyCompactButtonSize(submitButton, 170);
     cancelButton.addActionListener(e -> dialog.dispose());
     submitButton.addActionListener(e -> {
       dialog.dispose();
@@ -315,9 +311,7 @@ public class PayTuitionPage extends JPanel implements Refreshable {
     actions.add(cancelButton);
     actions.add(submitButton);
 
-    card.add(title);
-    card.add(Box.createVerticalStrut(4));
-    card.add(subtitle);
+    card.add(header);
     card.add(Box.createVerticalStrut(16));
     card.add(amountLabel);
     card.add(Box.createVerticalStrut(8));
@@ -363,15 +357,8 @@ public class PayTuitionPage extends JPanel implements Refreshable {
     card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
     card.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-    JPanel headerPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0, 0));
-    headerPanel.setOpaque(false);
-    headerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-    headerPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
-
-    JLabel title = new JLabel("Receipt Preview");
-    title.setFont(UITheme.SUBTITLE_FONT);
-    UITheme.themeLabel(title);
-    headerPanel.add(title);
+    JPanel headerPanel = buildDialogHeader("Receipt Preview",
+                                           "Review or save this payment receipt");
 
     String receiptBody = buildReceiptContent(student, transaction, paidAmount);
     JTextArea receiptArea = new JTextArea(receiptBody);
@@ -399,13 +386,14 @@ public class PayTuitionPage extends JPanel implements Refreshable {
     receiptContentPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
     receiptContentPanel.add(receiptScroll, BorderLayout.CENTER);
 
-    JPanel actions = new JPanel(new GridLayout(1, 2, 20, 0));
+    JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
     actions.setOpaque(false);
     actions.setAlignmentX(Component.LEFT_ALIGNMENT);
-    actions.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
 
     JButton closeButton = UITheme.secondaryButton("Close");
     JButton saveButton = UITheme.primaryButton("Save");
+    applyCompactButtonSize(closeButton, 130);
+    applyCompactButtonSize(saveButton, 130);
 
     closeButton.addActionListener(e -> {
       closeDialogChain(dialog);
@@ -489,6 +477,34 @@ public class PayTuitionPage extends JPanel implements Refreshable {
 
   private void syncAmountLabel(JLabel amountValue, double amount) {
     amountValue.setText("PHP " + CURRENCY.format(amount));
+  }
+
+  private JPanel buildDialogHeader(String titleText, String subtitleText) {
+    JPanel header = UITheme.cardPanel();
+    header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+    header.setAlignmentX(Component.LEFT_ALIGNMENT);
+    header.setBorder(BorderFactory.createEmptyBorder(10, 12, 10, 12));
+
+    JLabel title = new JLabel(titleText);
+    title.setFont(UITheme.SUBTITLE_FONT);
+    title.setAlignmentX(Component.LEFT_ALIGNMENT);
+    UITheme.themeLabel(title);
+
+    JLabel subtitle = new JLabel(subtitleText);
+    subtitle.setFont(UITheme.customFont(UITheme.FONT_FAMILY, UITheme.FONT_WEIGHT_LABEL, 12));
+    subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+    subtitle.setForeground(UITheme.MUTED_TEXT);
+
+    header.add(title);
+    header.add(Box.createVerticalStrut(2));
+    header.add(subtitle);
+    return header;
+  }
+
+  private void applyCompactButtonSize(JButton button, int width) {
+    button.setPreferredSize(new Dimension(width, 36));
+    button.setMinimumSize(new Dimension(width, 36));
+    button.setMaximumSize(new Dimension(width, 36));
   }
 
   private void closeDialogChain(Dialog dialog) {
