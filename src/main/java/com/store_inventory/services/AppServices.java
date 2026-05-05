@@ -1,17 +1,11 @@
 package com.store_inventory.services;
 
-import com.store_inventory.models.Admin;
 import com.store_inventory.models.Student;
 
 public class AppServices {
-  private static final String ROLE_ADMIN = "ADMIN";
-  private static final String ROLE_STUDENT = "STUDENT";
-
   private StudentManager studentManager;
   private TransactionManager transactionManager;
-  private AdminManager adminManager;
   private String currentAccountId;
-  private String currentAccountRole;
 
   public AppServices() {
     initializeManagers();
@@ -20,7 +14,6 @@ public class AppServices {
   public final void initializeManagers() {
     this.transactionManager = new TransactionManager();
     this.studentManager = new StudentManager(transactionManager);
-    this.adminManager = new AdminManager(studentManager, transactionManager);
     clearCurrentAccount();
   }
 
@@ -32,48 +25,33 @@ public class AppServices {
     return transactionManager;
   }
 
-  public AdminManager getAdminManager() {
-    return adminManager;
-  }
-
-  public void setCurrentAccount(String accountId, String role) {
+  public void setCurrentAccount(String accountId) {
     this.currentAccountId = accountId;
-    this.currentAccountRole = role;
   }
 
   public String getCurrentAccountId() {
     return currentAccountId;
   }
 
-  public String getCurrentAccountRole() {
-    return currentAccountRole;
-  }
-
   public void clearCurrentAccount() {
     this.currentAccountId = null;
-    this.currentAccountRole = null;
   }
 
-  public Object login(String accountId, String password) {
+  public Student login(String accountId, String password) {
     if (accountId == null || password == null) {
       clearCurrentAccount();
       return null;
     }
 
     String normalizedId = accountId.trim();
-    if (adminManager.authenticate(normalizedId, password)) {
-      setCurrentAccount(normalizedId, ROLE_ADMIN);
-      return adminManager.getAdmin();
-    }
-
     Student student = studentManager.authenticate(normalizedId, password);
-    if (student != null) {
-      setCurrentAccount(student.getStudentId(), ROLE_STUDENT);
-      return student;
+    if (student == null) {
+      clearCurrentAccount();
+      return null;
     }
 
-    clearCurrentAccount();
-    return null;
+    setCurrentAccount(student.getStudentId());
+    return student;
   }
 
   public void logout() {
@@ -81,20 +59,9 @@ public class AppServices {
   }
 
   public Student getCurrentStudent() {
-    if (!ROLE_STUDENT.equals(currentAccountRole) || currentAccountId == null) {
+    if (currentAccountId == null) {
       return null;
     }
     return studentManager.findStudentById(currentAccountId);
-  }
-
-  public Admin getCurrentAdmin() {
-    if (!ROLE_ADMIN.equals(currentAccountRole) || currentAccountId == null) {
-      return null;
-    }
-    Admin admin = adminManager.getAdmin();
-    if (admin == null) {
-      return null;
-    }
-    return currentAccountId.equals(admin.getAdminId()) ? admin : null;
   }
 }

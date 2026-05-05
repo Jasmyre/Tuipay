@@ -8,8 +8,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
 public class Header extends JPanel {
-  private static final String ADMIN_ID_PREFIX = "ADMIN";
-
   private final JLabel titleLabel = new JLabel();
   private final JLabel userLabel = new JLabel();
   private final JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 12));
@@ -71,26 +69,15 @@ public class Header extends JPanel {
   private void rebuildNavigation() {
     right.removeAll();
 
-    if (isAdminUser()) {
-      right.add(navButton("Admin Dashboard", Navigation.ADMIN_PAGE, handler));
-      right.add(navButton("Manage Students", Navigation.MANAGE_STUDENTS, handler));
-      right.add(navButton("View Transactions", Navigation.VIEW_TRANSACTIONS, handler));
-      right.add(navButton("Update Tuition", Navigation.UPDATE_TUITION, handler));
-    } else {
-      right.add(navButton("Student Page", Navigation.STUDENT_PAGE, handler));
-      right.add(navButton("Top Up Wallet", Navigation.TOP_UP, handler));
-      right.add(navButton("Pay Tuition", Navigation.PAY_TUITION, handler));
-    }
+    right.add(navButton("Student Page", Navigation.STUDENT_PAGE, handler));
+    right.add(navButton("Top Up Wallet", Navigation.TOP_UP, handler));
+    right.add(navButton("Pay Tuition", Navigation.PAY_TUITION, handler));
+    right.add(navButton("Transaction History", Navigation.TRANSACTION_HISTORY, handler));
 
     right.add(modeToggleButton(handler));
     right.add(logoutButton(handler));
     right.revalidate();
     right.repaint();
-  }
-
-  private boolean isAdminUser() {
-    return currentUser != null
-        && currentUser.toUpperCase().startsWith(ADMIN_ID_PREFIX);
   }
 
   private JButton navButton(String label, String destination,

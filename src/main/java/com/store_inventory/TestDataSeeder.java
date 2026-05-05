@@ -1,8 +1,6 @@
 package com.store_inventory;
 
-import com.store_inventory.models.Admin;
 import com.store_inventory.models.Student;
-import com.store_inventory.services.AdminManager;
 import com.store_inventory.services.AppServices;
 import com.store_inventory.services.StudentManager;
 
@@ -15,11 +13,6 @@ public final class TestDataSeeder {
     }
 
     StudentManager studentManager = services.getStudentManager();
-    AdminManager adminManager = services.getAdminManager();
-
-    if (adminManager.getAdmin() == null) {
-      adminManager.setAdmin(new Admin("ADMIN", "admin", "admin123"));
-    }
 
     seedStudent(studentManager, "202509-0033", "student01", "Juan Dela Cruz",
                 "password", 12000, 2000);

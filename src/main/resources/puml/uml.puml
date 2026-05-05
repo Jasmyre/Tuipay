@@ -1,13 +1,9 @@
 @startuml
-title Tuipay - System UML (Models + Services + Core Flow)
+title Tuipay - Student-Only System UML
 
 skinparam packageStyle rectangle
 
-' =======================
-' MODELS
-' =======================
 package "models" {
-
   class Student {
     - String studentId
     - String username
@@ -20,13 +16,6 @@ package "models" {
     + payTuition(amount: double)
     + addTransaction(t: Transaction)
     + getTransactionHistory(): List<Transaction>
-  }
-
-  class Admin {
-    - String adminId
-    - String username
-    - String password
-    + authenticate(id: String, password: String): boolean
   }
 
   class Transaction {
@@ -47,20 +36,16 @@ package "models" {
   Student "1" --> "*" Transaction
 }
 
-' =======================
-' SERVICES
-' =======================
 package "services" {
-
   class AppServices {
     - StudentManager studentManager
     - TransactionManager transactionManager
-    - AdminManager adminManager
     - String currentAccountId
-    - String currentAccountRole
     + initializeManagers()
-    + setCurrentAccount(id: String, role: String)
+    + setCurrentAccount(id: String)
     + clearCurrentAccount()
+    + login(id: String, password: String): Student
+    + getCurrentStudent(): Student
   }
 
   class StudentManager {
@@ -73,62 +58,43 @@ package "services" {
   class TransactionManager {
     + createTopUpTransaction(student: Student, amount: double): Transaction
     + createPaymentTransaction(student: Student, amount: double): Transaction
-    + getAllTransactions(): List<Transaction>
-  }
-
-  class AdminManager {
-    + getAdmin(): Admin
-    + viewStudents(): List<Student>
-    + viewTransactions(): List<Transaction>
+    + getAllTransactions(students: List<Student>): List<Transaction>
   }
 
   AppServices --> StudentManager
   AppServices --> TransactionManager
-  AppServices --> AdminManager
 
   StudentManager --> Student
   TransactionManager --> Transaction
-  AdminManager --> Admin
-  AdminManager --> Student
-  AdminManager --> Transaction
 }
 
-' =======================
-' UI LAYER (PAGES)
-' =======================
 package "pages (Swing UI)" {
-
   class AppFrame {
-    + switchPage(name: String)
+    + navigate(destination: String)
+    + logout()
+    + changeTheme(mode)
   }
 
-  class HomePage
+  class LoginPage
+  class Header
   class StudentPage
-  class TransactionPage
-  class AdminPage
-  class ReportsPage
+  class TopUpPage
+  class PayTuitionPage
+  class TransactionHistoryPage
 
-  AppFrame --> HomePage
+  AppFrame --> LoginPage
+  AppFrame --> Header
   AppFrame --> StudentPage
-  AppFrame --> TransactionPage
-  AppFrame --> AdminPage
-  AppFrame --> ReportsPage
+  AppFrame --> TopUpPage
+  AppFrame --> PayTuitionPage
+  AppFrame --> TransactionHistoryPage
 
-  HomePage --> StudentManager
-  HomePage --> TransactionManager
-
-  StudentPage --> StudentManager
-  TransactionPage --> TransactionManager
-  AdminPage --> AdminManager
-  AdminPage --> StudentManager
-  AdminPage --> TransactionManager
-  ReportsPage --> StudentManager
-  ReportsPage --> TransactionManager
+  StudentPage --> AppServices
+  TopUpPage --> AppServices
+  PayTuitionPage --> AppServices
+  TransactionHistoryPage --> AppServices
 }
 
-' =======================
-' BOOTSTRAP
-' =======================
 class App {
   + main()
 }
@@ -140,6 +106,5 @@ class TestDataSeeder {
 App --> AppServices
 App --> TestDataSeeder
 TestDataSeeder --> StudentManager
-TestDataSeeder --> TransactionManager
 
 @enduml

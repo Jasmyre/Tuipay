@@ -33,17 +33,17 @@ public class LoginPage extends JPanel {
     card.setBorder(new javax.swing.border.CompoundBorder(
         card.getBorder(), new EmptyBorder(28, 32, 28, 32)));
 
-    JLabel title = new JLabel("Welcome to the System");
+    JLabel title = new JLabel("Welcome to Tuipay");
     title.setFont(UITheme.TITLE_FONT);
     title.setAlignmentX(Component.LEFT_ALIGNMENT);
     UITheme.themeLabel(title);
 
-    JLabel subtitle = new JLabel("Verify your identity");
+    JLabel subtitle = new JLabel("Sign in with your student account");
     subtitle.setFont(UITheme.SUBTITLE_FONT);
     subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
     UITheme.themeLabel(subtitle);
 
-    JLabel idLabel = new JLabel("ID:");
+    JLabel idLabel = new JLabel("Student ID:");
     idLabel.setFont(UITheme.LABEL_FONT);
     idLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
     UITheme.themeLabel(idLabel);

@@ -1,6 +1,5 @@
 package com.store_inventory.pages;
 
-import com.store_inventory.models.Admin;
 import com.store_inventory.models.Student;
 import com.store_inventory.pages.components.Header;
 import com.store_inventory.pages.components.UITheme;
@@ -44,10 +43,6 @@ public class AppFrame extends JFrame implements NavigationHandler {
 
   private void initializeTitles() {
     titles.put(Navigation.STUDENT_PAGE, "Student Page");
-    titles.put(Navigation.ADMIN_PAGE, "Admin Dashboard");
-    titles.put(Navigation.MANAGE_STUDENTS, "Manage Students");
-    titles.put(Navigation.VIEW_TRANSACTIONS, "View Transactions");
-    titles.put(Navigation.UPDATE_TUITION, "Update Tuition");
     titles.put(Navigation.TOP_UP, "Top Up Wallet");
     titles.put(Navigation.PAY_TUITION, "Pay Tuition");
     titles.put(Navigation.TRANSACTION_HISTORY, "Transaction History");
@@ -94,10 +89,6 @@ public class AppFrame extends JFrame implements NavigationHandler {
     pagePanel.setBackground(UITheme.BACKGROUND);
     studentDashboardPage = new StudentPage(this, services);
     addPage(Navigation.STUDENT_PAGE, studentDashboardPage);
-    addPage(Navigation.ADMIN_PAGE, new AdminPage(services));
-    addPage(Navigation.MANAGE_STUDENTS, new ManageStudentsPage(services));
-    addPage(Navigation.VIEW_TRANSACTIONS, new ViewTransactionsPage(services));
-    addPage(Navigation.UPDATE_TUITION, new UpdateTuitionPage(services));
     addPage(Navigation.TOP_UP, new TopUpPage(services, this));
     addPage(Navigation.PAY_TUITION, new PayTuitionPage(services, this));
     addPage(Navigation.TRANSACTION_HISTORY,
@@ -110,22 +101,16 @@ public class AppFrame extends JFrame implements NavigationHandler {
 
   private void wireLoginAction() {
     loginPage.getLoginButton().addActionListener(e -> {
-      Object account = services.login(loginPage.getId(), loginPage.getPassword());
+      Student account = services.login(loginPage.getId(), loginPage.getPassword());
       if (account != null) {
-        if (account instanceof Admin) {
-          currentUser = ((Admin)account).getAdminId();
-          currentDestination = Navigation.ADMIN_PAGE;
-        } else if (account instanceof Student) {
-          currentUser = ((Student)account).getStudentId();
-          currentDestination = Navigation.STUDENT_PAGE;
-        } else {
-          currentUser = loginPage.getId();
-          currentDestination = Navigation.STUDENT_PAGE;
-        }
+        currentUser = account.getStudentId();
+        currentDestination = Navigation.STUDENT_PAGE;
         appVisible = true;
         showApp();
       } else {
-        JOptionPane.showMessageDialog(this, "Invalid ID or password", "Error",
+        JOptionPane.showMessageDialog(this,
+                                      "Invalid Student ID or password",
+                                      "Error",
                                       JOptionPane.ERROR_MESSAGE);
       }
     });
@@ -140,7 +125,7 @@ public class AppFrame extends JFrame implements NavigationHandler {
   @Override
   public void navigate(String destination) {
     currentDestination = resolveDestination(destination);
-    String defaultTitle = isAdminUser() ? "Admin Dashboard" : "Student Page";
+    String defaultTitle = "Student Page";
     String title = titles.getOrDefault(currentDestination, defaultTitle);
     if (Navigation.STUDENT_PAGE.equals(currentDestination)) {
       title = defaultTitle;
@@ -182,9 +167,5 @@ public class AppFrame extends JFrame implements NavigationHandler {
   private void addPage(String key, JPanel page) {
     pages.put(key, page);
     pagePanel.add(page, key);
-  }
-
-  private boolean isAdminUser() {
-    return services.getCurrentAdmin() != null;
   }
 }

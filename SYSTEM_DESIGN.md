@@ -1,38 +1,31 @@
-
 # Tuipay System Design
 
 ## 1) Purpose
 
-This document describes how the Tuipay application is connected across:
+This document describes the current student-only architecture of Tuipay across:
 
 * Models
-* Services/Managers
-* Pages (UI)
-* Application composition (`AppServices`)
-* Startup backend bootstrap (`TestDataSeeder`)
-
-It is based on the current Java Swing prototype implementation.
-
----
+* Services
+* Swing pages
+* App composition (`AppServices`)
+* Startup seed flow (`TestDataSeeder`)
 
 ## 2) High-Level Architecture
 
-Tuipay is a **Java Swing desktop application** using in-memory storage only.
+Tuipay is a Java Swing desktop app that uses in-memory storage for the active session.
 
 ```text
 App.main
-  -> AppServices (creates managers)
-  -> TestDataSeeder.seed(services) (preloads students, admin, sample transactions)
-  -> AppFrame(services) (connects UI pages)
+  -> AppServices (creates StudentManager + TransactionManager)
+  -> TestDataSeeder.seed(services) (preloads student accounts + sample transactions)
+  -> AppFrame(services)
 
-Pages (UI) <-> Managers/Services <-> Models (in-memory objects)
+Pages (UI) <-> Services <-> Models
 ```
 
-No database is used. All data is stored in `ArrayList` inside service classes and resets when the app closes.
+All runtime data is stored in memory and resets when the app closes.
 
----
-
-## 3) Startup and Composition Flow
+## 3) Startup and Composition
 
 ### 3.1 `App.java`
 
@@ -42,46 +35,37 @@ Startup sequence:
 2. Seed demo data via `TestDataSeeder.seed(services)`
 3. Launch `AppFrame(services)` on Swing EDT
 
----
-
 ### 3.2 `AppServices.java`
 
-Acts as the **central dependency container**:
+Acts as the session container:
 
 * `StudentManager`
 * `TransactionManager`
-* `AdminManager`
+* `currentAccountId`
 
-Provides shared instances for the whole session.
+Responsibilities:
 
-👉 This ensures all pages use the same in-memory data.
-
----
+* initialize shared services
+* handle student login/logout
+* expose current logged-in student
 
 ### 3.3 `TestDataSeeder.java`
 
 Bootstraps demo data:
 
-* Creates seeded **Student accounts**
-* Creates seeded **Admin account**
-* Preloads sample:
-
-  * wallet top-ups
-  * tuition payments
-  * transaction history
+* creates seeded student accounts
+* creates sample top-up and tuition payment transactions
 
 Validation rules:
 
 * skips invalid student IDs
-* skips payments if insufficient wallet or tuition logic fails
-
----
+* avoids duplicate student records
 
 ## 4) Domain Model Layer
 
 ### 4.1 `Student`
 
-Represents a student account:
+Fields:
 
 * `studentId`
 * `username`
@@ -91,293 +75,109 @@ Represents a student account:
 * `walletBalance`
 * `transactions`
 
-Core behavior:
+Behavior:
 
 * `topUp(amount)`
 * `payTuition(amount)`
 * `addTransaction(transaction)`
 * `getTransactionHistory()`
 
-👉 Represents both identity + financial state of student
+### 4.2 `Transaction`
 
----
-
-### 4.2 `Admin`
-
-Represents system administrator:
-
-* `adminId`
-* `username`
-* `password`
-
-Core behavior:
-
-* `authenticate(id, password)`
-
-👉 Used only for access control
-
----
-
-### 4.3 `Transaction`
-
-Represents all financial actions:
+Fields:
 
 * `transactionId`
 * `studentId`
-* `type (TOP_UP / TUITION_PAYMENT)`
+* `type`
 * `amount`
 * `transactionDate`
 * `remainingTuitionBalance`
 
-Core behavior:
+Behavior:
 
 * `generateReceipt()`
 
----
-
-### 4.4 `TransactionType`
+### 4.3 `TransactionType`
 
 Enum values:
 
 * `TOP_UP`
 * `TUITION_PAYMENT`
 
----
+## 5) Service Layer
 
-## 5) Service / Manager Layer
+### 5.1 `StudentManager`
 
-### 5.1 `AppManagerService`
+Handles student-side operations:
 
-Main system controller:
+* authenticate student credentials
+* retrieve student records
+* top up wallet
+* pay tuition
+* fetch payment history
 
-* connects all managers
-* tracks current logged-in user
-* stores session state:
+### 5.2 `TransactionManager`
 
-  * `currentAccountId`
-  * `currentAccountRole`
+Handles transaction creation and aggregation:
 
-Functions:
+* create top-up transactions
+* create tuition payment transactions
+* aggregate transactions across students
 
-* initialize managers
-* get managers
-* set/clear session
-
-👉 Acts like “session manager + system coordinator”
-
----
-
-### 5.2 `StudentManager`
-
-Handles student operations:
-
-* get all students
-* find student by ID
-* wallet top-up
-* tuition payment
-* update balances
-
-👉 Main business logic for student financial actions
-
----
-
-### 5.3 `TransactionManager`
-
-Handles transaction records:
-
-* create top-up transaction
-* create tuition payment transaction
-* retrieve all transactions
-
-👉 Central history system for all money actions
-
----
-
-### 5.4 `AdminManager`
-
-Handles admin-level operations:
-
-* get admin account
-* view student records
-* view all transactions
-
-👉 Read-only monitoring + management layer
-
----
-
-## 6) Page Layer and Service Connections
+## 6) UI Layer
 
 ### 6.1 `AppFrame`
 
-Main UI shell:
+Main application shell:
 
-* uses `CardLayout` for navigation
-* injects managers into all pages
-* manages login session state
+* controls root/login/app card layouts
+* routes between student pages
+* refreshes current page after navigation
 
-Pages injected:
+### 6.2 Student Pages
 
-* `HomePage(StudentManager, TransactionManager)`
-* `StudentPage(StudentManager)`
-* `TransactionPage(TransactionManager)`
-* `AdminPage(AdminManager, StudentManager, TransactionManager)`
-* `ReportsPage(...)`
+Current student-facing pages include:
 
----
+* `StudentPage`
+* `TopUpPage`
+* `PayTuitionPage`
+* `TransactionHistoryPage`
 
-### 6.2 `HomePage`
+### 6.3 Shared Components
 
-Dashboard view:
+Common page chrome and theming:
 
-Shows:
+* `Header` (student navigation + theme toggle + logout)
+* `UITheme`
+* `WindowTitleBar`
 
-* total students
-* total transactions
-* system summary
-
-👉 Read-only overview using managers
-
----
-
-### 6.3 `StudentPage`
-
-Student management UI:
-
-* view student info
-* wallet balance
-* tuition balance
-* transaction history
-
-Actions:
-
-* top up wallet
-* pay tuition
-
----
-
-### 6.4 `TransactionPage`
-
-Displays all transactions:
-
-* type
-* amount
-* date
-* remaining tuition balance
-
-Uses `TransactionManager`
-
----
-
-### 6.5 `AdminPage`
-
-Admin control panel:
-
-* view all students
-* view all transactions
-* monitor balances
-
----
-
-### 6.6 `ReportsPage`
-
-Export system reports:
-
-* student summary
-* transaction history
-* financial overview
-
-Outputs:
-
-* CSV files via report classes
-
----
-
-## 7) Backend Logic: End-to-End Flows
+## 7) End-to-End Flows
 
 ### 7.1 Student Login Flow
 
-1. User enters ID + password
-2. `AdminManager` or `StudentManager` validates
-3. `AppManagerService` sets session role
-4. UI routes to correct dashboard
+1. Student submits Student ID and password
+2. `StudentManager` authenticates
+3. `AppServices` stores `currentAccountId`
+4. `AppFrame` routes to `StudentPage`
 
----
+### 7.2 Top-Up Flow
 
-### 7.2 Tuition Payment Flow
+1. Student enters top-up amount
+2. Wallet balance is updated
+3. `TransactionManager` creates TOP_UP transaction
+4. UI refreshes balances and history
 
-1. Student selects amount
-2. Validate wallet balance
-3. Deduct wallet
-4. Deduct tuition balance
-5. Create `Transaction`
-6. Store in `TransactionManager`
-7. Update UI
+### 7.3 Tuition Payment Flow
 
----
+1. Student enters payment amount
+2. App validates wallet and tuition balance constraints
+3. Wallet and tuition balances are updated
+4. `TransactionManager` creates TUITION_PAYMENT transaction
+5. Receipt is shown and optionally exported
 
-### 7.3 Top-Up Flow
+## 8) Constraints
 
-1. Student enters amount
-2. Add to wallet balance
-3. Create TOP_UP transaction
-4. Store transaction
-5. Refresh UI
-
----
-
-### 7.4 Admin Monitoring Flow
-
-1. Admin logs in
-2. System loads all managers
-3. Admin views:
-
-   * students
-   * transactions
-   * balances
-
----
-
-## 8) Design Constraints and Implications
-
-* ❌ No database (in-memory only)
-* ❌ No real payment integration (simulated only)
-* ❌ No registration system
-* ❌ No persistence after restart
-* ⚠️ Direct object mutation (ArrayList exposed)
-* ⚠️ Single-session desktop application only
-
----
-
-## 9) Relationship Map (Summary)
-
-```text
-App
-  -> AppServices
-     -> StudentManager ----> Student -> Transaction
-     -> AdminManager ------> Admin
-     -> TransactionManager -> Transaction
-
-App
-  -> TestDataSeeder
-     -> StudentManager.add/update balances
-     -> TransactionManager.record transactions
-
-AppFrame
-  -> HomePage(StudentManager, TransactionManager)
-  -> StudentPage(StudentManager)
-  -> TransactionPage(TransactionManager)
-  -> AdminPage(AdminManager, StudentManager, TransactionManager)
-  -> ReportsPage(...)
-```
-
----
-
-## 10) Key Design Idea
-
-Tuipay is structured as:
-
-* **Models = data (Student, Admin, Transaction)**
-* **Managers = business logic**
-* **AppServices = system container**
-* **AppFrame = UI router**
-* **Seeder = demo data initializer**
+* No persistent database
+* No real payment gateway integration
+* No registration/forgot-password flow
+* Single-process desktop session only
