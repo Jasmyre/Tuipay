@@ -1,4 +1,4 @@
-package com.store_inventory.models;
+package com.tuipay.models;
 
 public enum TransactionType {
   TOP_UP,

@@ -1,4 +1,4 @@
-package com.store_inventory.pages;
+package com.tuipay.pages;
 
 public final class Navigation {
   public static final String STUDENT_PAGE = "studentPage";

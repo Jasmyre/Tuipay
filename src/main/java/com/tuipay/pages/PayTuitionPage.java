@@ -1,10 +1,5 @@
-package com.store_inventory.pages;
+package com.tuipay.pages;
 
-import com.store_inventory.models.Student;
-import com.store_inventory.models.Transaction;
-import com.store_inventory.pages.components.DialogTitleBar;
-import com.store_inventory.pages.components.UITheme;
-import com.store_inventory.services.AppServices;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
@@ -33,6 +28,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+
+import com.tuipay.models.Student;
+import com.tuipay.models.Transaction;
+import com.tuipay.pages.components.DialogTitleBar;
+import com.tuipay.pages.components.UITheme;
+import com.tuipay.services.AppServices;
 
 public class PayTuitionPage extends JPanel implements Refreshable {
   private static final DecimalFormat CURRENCY = new DecimalFormat("#,##0.00");

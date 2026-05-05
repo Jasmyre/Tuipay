@@ -1,4 +1,4 @@
-package com.store_inventory.pages.components;
+package com.tuipay.pages.components;
 
 import java.awt.*;
 import java.util.Arrays;

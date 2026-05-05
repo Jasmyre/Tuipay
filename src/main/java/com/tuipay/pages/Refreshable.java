@@ -1,4 +1,4 @@
-package com.store_inventory.pages;
+package com.tuipay.pages;
 
 public interface Refreshable {
   void refresh();

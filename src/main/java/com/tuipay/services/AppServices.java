@@ -1,6 +1,6 @@
-package com.store_inventory.services;
+package com.tuipay.services;
 
-import com.store_inventory.models.Student;
+import com.tuipay.models.Student;
 
 public class AppServices {
   private StudentManager studentManager;

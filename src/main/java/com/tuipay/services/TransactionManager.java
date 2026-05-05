@@ -1,11 +1,12 @@
-package com.store_inventory.services;
+package com.tuipay.services;
 
-import com.store_inventory.models.Student;
-import com.store_inventory.models.Transaction;
-import com.store_inventory.models.TransactionType;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import com.tuipay.models.Student;
+import com.tuipay.models.Transaction;
+import com.tuipay.models.TransactionType;
 
 public class TransactionManager {
   private final List<Transaction> transactions = new ArrayList<>();

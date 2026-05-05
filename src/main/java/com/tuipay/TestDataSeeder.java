@@ -1,8 +1,8 @@
-package com.store_inventory;
+package com.tuipay;
 
-import com.store_inventory.models.Student;
-import com.store_inventory.services.AppServices;
-import com.store_inventory.services.StudentManager;
+import com.tuipay.models.Student;
+import com.tuipay.services.AppServices;
+import com.tuipay.services.StudentManager;
 
 public final class TestDataSeeder {
   private TestDataSeeder() {}

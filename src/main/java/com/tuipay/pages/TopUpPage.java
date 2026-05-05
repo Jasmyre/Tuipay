@@ -1,10 +1,5 @@
-package com.store_inventory.pages;
+package com.tuipay.pages;
 
-import com.store_inventory.models.Student;
-import com.store_inventory.pages.components.DialogTitleBar;
-import com.store_inventory.pages.components.UITheme;
-import com.store_inventory.services.AppServices;
-import com.store_inventory.services.TopUpProviderRegistry;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -25,6 +20,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+
+import com.tuipay.models.Student;
+import com.tuipay.pages.components.DialogTitleBar;
+import com.tuipay.pages.components.UITheme;
+import com.tuipay.services.AppServices;
+import com.tuipay.services.TopUpProviderRegistry;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;

@@ -1,9 +1,10 @@
-package com.store_inventory.pages;
+package com.tuipay.pages;
 
-import com.store_inventory.pages.components.UITheme;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
+
+import com.tuipay.pages.components.UITheme;
 
 public class LoginPage extends JPanel {
   private final JTextField idField = new JTextField(20);

@@ -1,11 +1,12 @@
-package com.store_inventory.pages.components;
+package com.tuipay.pages.components;
 
-import com.store_inventory.pages.Navigation;
-import com.store_inventory.pages.NavigationHandler;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
+
+import com.tuipay.pages.Navigation;
+import com.tuipay.pages.NavigationHandler;
 
 public class Header extends JPanel {
   private final JLabel titleLabel = new JLabel();

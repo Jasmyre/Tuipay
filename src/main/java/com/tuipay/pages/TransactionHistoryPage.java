@@ -1,9 +1,5 @@
-package com.store_inventory.pages;
+package com.tuipay.pages;
 
-import com.store_inventory.models.Student;
-import com.store_inventory.models.Transaction;
-import com.store_inventory.pages.components.UITheme;
-import com.store_inventory.services.AppServices;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -14,6 +10,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.*;
+
+import com.tuipay.models.Student;
+import com.tuipay.models.Transaction;
+import com.tuipay.pages.components.UITheme;
+import com.tuipay.services.AppServices;
 
 public class TransactionHistoryPage extends JPanel implements Refreshable {
   private static final DecimalFormat CURRENCY = new DecimalFormat("#,##0.00");

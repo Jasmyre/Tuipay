@@ -1,11 +1,12 @@
-package com.store_inventory;
+package com.tuipay;
 
-import com.store_inventory.pages.AppFrame;
-import com.store_inventory.services.AppServices;
 import java.awt.Color;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
+
+import com.tuipay.pages.AppFrame;
+import com.tuipay.services.AppServices;
 
 public class App {
   public static void main(String[] args) {

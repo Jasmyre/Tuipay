@@ -1,6 +1,6 @@
-package com.store_inventory.pages;
+package com.tuipay.pages;
 
-import com.store_inventory.pages.components.UITheme;
+import com.tuipay.pages.components.UITheme;
 
 public interface NavigationHandler {
   abstract void navigate(String destination);

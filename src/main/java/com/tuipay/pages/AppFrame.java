@@ -1,14 +1,15 @@
-package com.store_inventory.pages;
+package com.tuipay.pages;
 
-import com.store_inventory.models.Student;
-import com.store_inventory.pages.components.Header;
-import com.store_inventory.pages.components.UITheme;
-import com.store_inventory.pages.components.WindowTitleBar;
-import com.store_inventory.services.AppServices;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
+
+import com.tuipay.models.Student;
+import com.tuipay.pages.components.Header;
+import com.tuipay.pages.components.UITheme;
+import com.tuipay.pages.components.WindowTitleBar;
+import com.tuipay.services.AppServices;
 
 public class AppFrame extends JFrame implements NavigationHandler {
   private static final String ROOT_LOGIN = "rootLogin";

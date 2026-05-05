@@ -1,9 +1,10 @@
-package com.store_inventory.services;
+package com.tuipay.services;
 
-import com.store_inventory.models.Student;
-import com.store_inventory.models.Transaction;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.tuipay.models.Student;
+import com.tuipay.models.Transaction;
 
 public class StudentManager {
   private final List<Student> students = new ArrayList<>();

@@ -1,4 +1,4 @@
-package com.store_inventory.services;
+package com.tuipay.services;
 
 import java.util.List;
 

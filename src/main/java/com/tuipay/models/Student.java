@@ -1,4 +1,4 @@
-package com.store_inventory.models;
+package com.tuipay.models;
 
 import java.util.ArrayList;
 import java.util.Collections;
